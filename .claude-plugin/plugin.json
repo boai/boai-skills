@@ -1,15 +1,15 @@
 {
-  "name": "sogou-ad-killer",
+  "name": "boai-skills",
   "version": "1.0.0",
-  "description": "永久关闭搜狗输入法所有广告——商业推广、游戏中心、桌面弹窗、Chromium广告渲染引擎、写作助手、云服务广告，31+组件一键禁用",
+  "description": "博爱哥哥的 Claude Code 技能合集——搜狗广告清理、Windows 系统工具等实用技能，持续更新",
   "author": {
-    "name": "博爱哥哥",
-    "url": "https://github.com/sogou-ad-killer"
+    "name": "博爱哥哥 (BoAi)",
+    "url": "https://github.com/boai-dev"
   },
-  "homepage": "https://github.com/sogou-ad-killer/sogou-ad-killer",
-  "repository": "https://github.com/sogou-ad-killer/sogou-ad-killer",
+  "homepage": "https://github.com/boai-dev/boai-skills",
+  "repository": "https://github.com/boai-dev/boai-skills",
   "category": "utility",
-  "tags": ["windows", "sogou", "ad-blocker", "input-method", "privacy", "debloat"],
+  "tags": ["windows", "sogou", "ad-blocker", "input-method", "privacy", "debloat", "boai", "chinese"],
   "platforms": ["win32"],
   "license": "MIT",
   "strict": false,
