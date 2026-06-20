@@ -1,6 +1,6 @@
 ---
 name: 360-cleaner
-description: 清理360软件残留，只保留360驱动大师和360压缩，删除其他所有360相关的文件、缓存、注册表和驱动
+description: 扫描系统上所有360旗下的软件，让用户手动选择要卸载/清理的软件，支持预设方案
 triggers:
   - 清理360
   - 卸载360
@@ -10,204 +10,228 @@ triggers:
   - clean 360
   - remove 360
   - 360清理
+  - 管理360
 platform: windows
-verified: Windows 11 Pro + 360驱动大师 + 360压缩
+verified: Windows 11 Pro
 ---
 
-# 360 Cleaner（360 残留清理器）
+# 360 Cleaner（360 软件管理器）
 
-清理系统上除「360驱动大师」和「360压缩」之外的所有360相关残留（安全卫士、杀毒、浏览器、专家服务等）。
+扫描系统上已安装和残留的所有360产品，由用户**手动选择**要卸载/清理哪些。
 
-> ⚠️ 本工具仅删除残留文件和缓存，不影响360驱动大师和360压缩的正常使用。
-
-## 保留 vs 删除
-
-| 产品 | 标识 | 处理 |
-|------|------|------|
-| 🔧 360驱动大师 | `360DrvMgr`, `360Sensor_DM` | ✅ 保留 |
-| 🗜️ 360压缩 | `360zip`, `360Zip` | ✅ 保留 |
-| 🛡️ 360安全卫士 | `360safe`, `360reskit` | ❌ 删除 |
-| 🦠 360杀毒 | `360sd` | ❌ 删除 |
-| 🌐 360浏览器 | `360se` | ❌ 删除 |
-| 📡 360传输监控 | `360TptMon` | ❌ 删除 |
-| 🧑‍🔧 360专家服务 | `helpton.360.cn`, `opplat.jishi.360.cn` 缓存 | ❌ 删除 |
-| 📦 360安装器残留 | `360Base.dll`, `360net.dll`, `360Inst.exe` | ❌ 删除 |
-
-## 用法
-
-### 自动模式（推荐）
-
-直接对 Claude 说以下任意一句即可：
+## 工作流程
 
 ```
-/oh-my-claudecode:360-cleaner
+扫描发现 → 分类展示 → 用户勾选 → 执行清理 → 验证结果
 ```
 
-或提及触发词：
-- "清理360残留"
-- "卸载360"
-- "删除360，保留驱动和压缩"
+### 第 1 步：扫描发现
 
-Claude 将自动执行：全面扫描 → 识别保留/删除 → 执行删除 → 处理顽固驱动 → 验证结果。
-
-### 手动模式（如果自动执行权限不足）
-
-当遇到 `360reskit64.sys` 驱动文件无法删除时，Claude 会生成一个自提权 PowerShell 脚本，请右键以管理员身份运行：
-
-```powershell
-# 右键 → 使用 PowerShell 运行
-.\del360.ps1
-```
-
-## 自动化执行流程
-
-### 第 1 步：全面扫描
+扫描以下位置，找出所有360产品痕迹：
 
 ```bash
-# 扫描所有常见位置
-find /c/Program Files /c/Program Files (x86) /c/ProgramData \
-  /c/Users -maxdepth 6 -iname "*360*" -type d 2>/dev/null
+# 主安装目录
+ls -d "/c/Program Files (x86)/360/"*/
+ls -d "/c/Program Files/360/"*/ 2>/dev/null
 
-# 检查驱动文件
-ls /c/Windows/System32/drivers/*360*
-```
+# 开始菜单快捷方式
+ls -d "/c/ProgramData/Microsoft/Windows/Start Menu/Programs/360"*/
+ls -d "/c/Users/$USER/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/360"*/
 
-### 第 2 步：检查注册表
+# ProgramData 数据目录
+ls -d "/c/ProgramData/360"*/
 
-```bash
+# 用户数据目录
+ls -d "/c/Users/$USER/AppData/Roaming/360"*/
+ls -d "/c/Users/$USER/AppData/Local/360"*/
+ls -d "/c/Users/$USER/AppData/LocalLow/360"*/
+
+# 内核驱动
+ls /c/Windows/System32/drivers/360*
+
+# 注册表
 reg query "HKLM\SOFTWARE\WOW6432Node\360Safe" /s 2>/dev/null
 reg query "HKCU\SOFTWARE\360" /s 2>/dev/null
+
+# Windows 服务
+sc query state= all 2>/dev/null | grep -i "360"
 ```
 
-### 第 3 步：删除已知残留
+### 第 2 步：分类展示
 
-```bash
-# 开始菜单残留
-rm -rf "/c/ProgramData/Microsoft/Windows/Start Menu/Programs/360安全中心"
-rm -rf "/c/Users/<用户名>/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/360安全中心"
+根据扫描结果，按以下分类整理给用户。每个产品标注**完整路径**和**磁盘占用**。
 
-# 360安装器临时文件（含360Base.dll, 360net.dll, 360Inst.exe）
-find "/c/Users/<用户名>/AppData/Local/Temp" -maxdepth 2 -path "*360*" -delete 2>/dev/null
+#### 360 产品识别表
 
-# 360专家服务缓存
-rm -rf "/c/Users/<用户名>/AppData/Roaming/Expert/cache"
+| 产品名 | 目录标识 | 常用路径 |
+|--------|----------|----------|
+| 🔧 360驱动大师 | `360DrvMgr` | `Program Files (x86)\360\360DrvMgr` |
+| 🗜️ 360压缩 | `360zip` | `Program Files (x86)\360\360zip` |
+| 🛡️ 360安全卫士 | `360safe` | `Program Files (x86)\360\360Safe` |
+| 🦠 360杀毒 | `360sd` | `Program Files\360\360sd` |
+| 🌐 360安全浏览器 | `360se` | `Program Files (x86)\360\360se` |
+| 🧹 360清理大师 | `360CleanHelper` | `Program Files (x86)\360\360CleanHelper` |
+| 📦 360软件管家 | `360SoftMgr` | `Program Files (x86)\360\360SoftMgr` |
+| 📱 360手机助手 | `360MobileMgr` | `Program Files (x86)\360\360MobileMgr` |
+| 🖼️ 360画报 | `360huabao` | `Program Files (x86)\360\360huabao` |
+| 🩹 360系统急救箱 | `360reskit`(exe) | `Program Files (x86)\360\360reskit` |
+| 🗑️ 360文件粉碎机 | `360FileShredder` | `Program Files (x86)\360\360FileShredder` |
+| 💾 360文件恢复 | `360FileRecovery` | `Program Files (x86)\360\360FileRecovery` |
+| 📡 360WiFi | `360WiFi` | `Program Files (x86)\360\360WiFi` |
+| 🎮 360游戏大厅 | `360Game` | `Program Files (x86)\360\360Game` |
+| 🔌 360漏洞修复 | `360leakfixer` | `Program Files (x86)\360\360leakfixer` |
+| 📺 360影视 | `360vod` | `Program Files (x86)\360\360vod` |
+| 🧑‍🔧 360专家服务 | `Expert` 缓存 | `AppData\Roaming\Expert` |
 
-# 360TptMon 日志
-find "/c/Users/<用户名>/AppData/LocalLow/SogouPY/LOG/IME" -name "360TptMon*.log" -delete 2>/dev/null
+#### 残留物分类（无主程序的产品残留）
 
-# 360图标缓存（Windows Master / 其他软件收录的360图标）
-find "/c/ProgramData/Windows Master" \( -name "*360safe*" -o -name "*360se*" -o -name "*360_safe_browser*" \) -delete 2>/dev/null
-find "/c/Users/<用户名>/AppData/Local/Windows Master" -name "*360se*" -delete 2>/dev/null
+| 残留类型 | 标识 | 说明 |
+|----------|------|------|
+| 安装器临时文件 | `360Base.dll`, `360net.dll`, `360Inst.exe` | 曾安装/卸载某360产品的残留 |
+| 图标/快捷方式缓存 | `*360safe*.png`, `*360se*.png` | 各类系统工具收录的360图标 |
+| 监控日志 | `360TptMon*.log` | 搜狗输入法等软件记录的360监控日志 |
+| IE缓存 | DOMStore `*360*` | IE浏览器访问360网站的DOM缓存 |
+| 开始菜单空壳 | `360安全中心` 快捷方式 | 指向已卸载程序的死链 |
 
-# IE浏览器360网站缓存
-find "/c/Users/<用户名>/AppData/Local/Microsoft/Internet Explorer/DOMStore" -name "*360*" -delete 2>/dev/null
+### 第 3 步：用户勾选
 
-# 注册表清理
-reg delete "HKLM\SOFTWARE\WOW6432Node\360Safe" /f 2>/dev/null
-reg delete "HKCU\SOFTWARE\360" /f 2>/dev/null
+使用 `AskUserQuestion` 工具，以 **多选 + 分组** 方式让用户勾选要删除的软件。
+
+预设快捷选项（作为第一个选项展示）：
+
+| 预设名称 | 说明 |
+|----------|------|
+| ⚡ 仅保留驱动和压缩 | 删掉所有其他360产品，只留 `360DrvMgr` + `360zip` |
+| 🔥 全部删除 | 删除所有360产品（包括驱动大师和压缩） |
+| ✏️ 手动挑选 | 逐个勾选要删除的产品 |
+
+**重要**：默认选中「仅保留驱动和压缩」作为推荐预设。
+
+### 第 4 步：执行清理
+
+根据用户选择，按以下策略清理每个产品：
+
+#### 清理策略
+
+对用户勾选的每个产品：
+
+```
+1. 终止相关进程（taskkill）
+2. 删除主程序目录（Program Files 下的产品目录）
+3. 删除用户数据目录（AppData\Roaming, AppData\Local 下的对应目录）
+4. 删除 ProgramData 共享数据（仅当对应产品不存在 Program Files 主目录时）
+5. 删除开始菜单快捷方式
+6. 删除内核驱动文件（C:\Windows\System32\drivers\ 下对应的 .sys）
+7. 清理注册表项
+8. 删除 Windows 服务（sc delete）
 ```
 
-### 第 4 步：处理顽固驱动文件
+#### 共享组件的处理
 
-`C:\Windows\System32\drivers\360reskit64.sys` 是360安全卫士的内核驱动残留，普通权限无法删除。
+部分文件被多个产品共享时，采用以下规则：
+- 安装在 `Program Files (x86)\360\` 下的子目录各自独立，按需删除
+- `ProgramData\360zip\` 仅属于360压缩，勾选压缩才删除
+- `AppData\Roaming\Expert\` 仅属于360专家服务，勾选才删除
+- `C:\Windows\System32\drivers\360Sensor_DM64.sys` 仅属于驱动大师
+- `C:\Windows\System32\drivers\360reskit64.sys` 属于360安全卫士
 
-**注意区分**：
-- `360reskit64.sys` → 360安全卫士的 rescue kit 驱动（**删除**）
-- `360Sensor_DM64.sys` → 360驱动大师的内核驱动（**保留**，DM = Driver Master）
+#### 顽固文件处理
+
+对受系统保护的文件（如 `C:\Windows\System32\drivers\360reskit64.sys`），使用自提权 PowerShell：
 
 ```powershell
-# 自提权 PowerShell 脚本
+# 生成自提权脚本，用户右键 "使用 PowerShell 运行"
 $admin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
 if (-not $admin) {
     Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
     exit
 }
-$f = "C:\Windows\System32\drivers\360reskit64.sys"
-if (-not (Test-Path $f)) { Write-Host "Already gone!"; exit }
-
-# 移除文件保护属性
-attrib -r -h -s $f 2>$null
-# 停止关联服务（如有）
-sc stop 360reskit64 2>$null
-# 夺取所有权
-cmd /c "takeown /f `"$f`""
-# 授予完全控制
-cmd /c "icacls `"$f`" /grant Administrators:F"
-# 删除
-cmd /c "del /f /q `"$f`""
-
-# 如果仍失败，标记重启后删除
-if (Test-Path $f) {
-    $def = @'
-[DllImport("kernel32.dll", SetLastError=true, CharSet=CharSet.Auto)]
-public static extern bool MoveFileEx(string lpExistingFileName, string lpNewFileName, int dwFlags);
-'@
-    Add-Type -Name MF -Namespace W32 -MemberDefinition $def
-    $r = [W32.MF]::MoveFileEx($f, $null, 4)
-    if ($r) { Write-Host "[OK] Marked for delete on reboot. Please restart." }
-}
+# 对每个顽固文件：
+#   1. attrib -r -h -s <file>     — 移除保护属性
+#   2. sc stop <service>           — 停止关联服务
+#   3. takeown /f <file>           — 夺取所有权
+#   4. icacls <file> /grant Administrators:F — 授予权限
+#   5. del /f /q <file>            — 删除
+#   如果仍失败 → MoveFileEx MOVEFILE_DELAY_UNTIL_REBOOT 标记重启删除
 ```
 
 ### 第 5 步：验证结果
 
 ```bash
-# 确认只有驱动大师和压缩残留
-find /c/ProgramData /c/Users /c/Program Files -maxdepth 6 -iname "*360*" 2>/dev/null | grep -iv "360zip\|360drvmgr\|360Drv"
+echo "=== 剩余360目录 ===" 
+find "/c/Program Files (x86)/360" "/c/ProgramData/360"* "/c/Users/$USER/AppData/Roaming/360"* -maxdepth 1 -type d 2>/dev/null
 
-# 确认360reskit已删除，360Sensor仍保留
-ls /c/Windows/System32/drivers/360*
+echo "=== 驱动残留 ===" 
+ls /c/Windows/System32/drivers/360* 2>/dev/null
 
-# 确认注册表已清
+echo "=== 注册表 ===" 
 reg query "HKLM\SOFTWARE\WOW6432Node\360Safe" 2>&1
 reg query "HKCU\SOFTWARE\360" 2>&1
 
-# 确认无360服务
-sc query state= all | grep -i "360"
+echo "=== 服务 ===" 
+sc query state= all 2>/dev/null | grep -i "360"
 ```
+
+---
+
+## 内置预设方案
+
+### 预设 1：仅保留驱动和压缩
+
+```
+保留：360DrvMgr, 360zip
+删除：其他所有360产品 + 所有残留物
+```
+
+触发词：`删除360保留驱动和压缩` `清理360只留驱动大师和360压缩`
+
+### 预设 2：全部删除
+
+```
+删除：所有360产品，包括驱动大师和压缩
+```
+
+触发词：`彻底删除所有360` `完全卸载360`
+
+### 预设 3：手动模式（默认）
+
+扫描 → 展示 → 用户勾选。无特定触发词，默认行为。
+
+---
 
 ## 关键陷阱
 
-### 误判风险
-大量非360文件在哈希/ID中包含数字"360"（如 `rule360000v2.xml`、`xbox_360_*.txt`、`dao360.dll`、Office包里的 `*360*.js` 等）。**必须通过目录上下文判断**，不能单纯按文件名匹配。
+### 误判过滤
 
-**过滤这些正常文件**：
-- `*.dartServer/*` — Dart 编译缓存
-- `*JianyingPro*` — 剪映缓存
-- `*Corsair*` — 海盗船驱动缓存
-- `*Netease*` — 网易云音乐歌词/缓存
-- `*Tencent*` — 腾讯QQ缓存
-- `*Steam*` — Steam Xbox 360手柄配置
-- `*NVIDIA*` — 显卡驱动缓存
-- `*Microsoft/Office*` — Office 规则文件
-- `*Microsoft/Windows/ClipSVC*` — Windows 系统文件
+大量非360文件在其哈希/ID中碰巧包含数字"360"，**不得匹配**：
 
-### 权限问题
-- 大部分残留文件无需管理员权限即可删除
-- `C:\Windows\System32\drivers\360reskit64.sys` 需要管理员权限并可能需要 `takeown` + `icacls`
-- 如果 `takeown` 也失败，使用 `MoveFileEx(MOVEFILE_DELAY_UNTIL_REBOOT)` 标记重启删除
+| 误判模式 | 示例 | 实际来源 |
+|----------|------|----------|
+| 随机哈希含360 | `rule360000v2.xml`, `*360*.js` | Office、VS Code 等 |
+| 产品名含360 | `xbox_360_*.txt` | Steam |
+| 版本号含360 | `dao360.dll` | Microsoft DAO |
+| 纯数字ID | `1336085817`, `536096151` | 网易云歌词 |
+| hex含360 | `dcc8d2360...` | AlibabaProtect |
 
-### 压缩更新缓存保护
-`AppData\Roaming\360zip\v3update\` 目录下的 `.exe` 安装包属于360压缩的正常更新缓存文件，**不应删除**。
+**判断逻辑**：只有当文件**路径的目录部分**包含360且是360产品目录（如 `360Safe`、`360sd`、`360zip` 等）时，才认定是360产品。**不要匹配**路径中散列UUID碰巧含"360"的文件。
+
+### 权限要求
+- 普通文件/目录：大部分无需管理员
+- `C:\Windows\System32\drivers\` 下的 `.sys` 文件：**必须管理员权限**
+- 运行中的服务/进程：先 `taskkill` / `sc stop`，再删除
+
+### 不完整卸载的常见残留
+- 卸载程序可能留下 `AppData\Roaming\` 下的空目录
+- 开始菜单快捷方式可能变成死链
+- 内核驱动 `.sys` 文件可能不被卸载程序处理
+- 注册表项可能残留
+
+---
 
 ## 验证标准
 
-- ✅ 无360安全卫士相关目录和文件
-- ✅ 无360杀毒残留
-- ✅ 无360浏览器残留
-- ✅ 注册表无360Safe相关项
-- ✅ 系统服务中无360广告/安全服务
-- ✅ `360reskit64.sys` 已删除
-- ✅ `360Sensor_DM64.sys` 仍保留（驱动大师）
-- ✅ `C:\Program Files (x86)\360\360DrvMgr\` 完整保留
-- ✅ `C:\Program Files (x86)\360\360zip\` 完整保留
-- ✅ 360驱动大师和360压缩正常使用
-
-## 适用版本
-
-- Windows 10 / Windows 11 所有版本
-- 适用于360安全卫士、360杀毒、360浏览器、360WiFi等360全系产品的残留清理
-- 非破坏性：不会影响360驱动大师和360压缩的正常使用
-
-## 恢复方法
-
-本工具执行的是**直接删除**（非重命名），删除后无法恢复。如需使用已删除的360产品（安全卫士/杀毒等），请重新安装。
+- ✅ 用户选择保留的产品完整可用
+- ✅ 用户选择删除的产品：主程序、用户数据、缓存、注册表、服务、驱动全部清理
+- ✅ 无死链快捷方式残留
+- ✅ 无注册表残留项
+- ✅ 无误删（非360文件未受影响）
