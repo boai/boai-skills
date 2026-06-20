@@ -1,6 +1,6 @@
 ---
 name: sogou-ad-killer
-description: 彻底永久关闭搜狗输入法所有广告（商业推广、游戏中心、桌面弹窗、Chromium 广告渲染引擎、写作助手、云服务广告等），31+ 组件一键禁用，支持自动化和手动恢复
+description: 扫描系统上所有搜狗旗下软件，让用户手动选择要关闭哪些软件的广告，支持一键全禁搜狗输入法
 triggers:
   - 搜狗广告
   - 关闭搜狗广告
@@ -10,107 +10,75 @@ triggers:
   - sogou ad killer
   - 去搜狗广告
   - 搜狗去广告
+  - 管理搜狗
 platform: windows
 verified: Windows 11 + 搜狗拼音 15.9.0.2525
 ---
 
-# Sogou Ad Killer（搜狗输入法广告清理）
+# Sogou Ad Killer（搜狗广告管理器）
 
-永久禁用搜狗输入法所有广告组件，通过将广告相关的可执行文件、DLL 和配置文件重命名为 `.bak` 后缀使其无法加载。
+扫描系统上所有搜狗旗下软件，由用户**手动勾选**要关闭广告的产品。
 
-> ⚠️ 本工具仅重命名文件（可逆），不删除任何文件。如需恢复，将 `.bak` 改回原名即可。
-
-## 原理
-
-搜狗输入法的广告通过以下载体展示：
-
-| 广告载体 | 组件/文件 | 广告形式 |
-|----------|-----------|----------|
-| **商业推广中心** | `biz_center/biz_bundle.dll` | 输入法内的商业推广卡片 |
-| **游戏中心** | `game_center/game_center.dll` | 游戏推荐弹窗 |
-| **桌面弹窗** | `SGDeskControl/SGDeskControl.dll` | 桌面右下角弹窗广告 |
-| **Chromium 渲染引擎** | `SGRender/SGRender.exe` + `libcef.dll` (完整 CEF 浏览器) | 运行富媒体广告（最占内存，~200MB） |
-| **写作助手** | `WriteSpirit/write_spirit.exe` | 写作辅助中的推荐/广告 |
-| **云服务** | `SogouCloud.exe` | 云端词库/推荐 |
-| **定时推送** | `userNetSchedule.exe` | 定时拉取广告素材 |
-| **迷你浏览器** | `SGMiniBrowserHelperHost.dll` | 嵌入式广告弹窗 |
-| **配置面板广告** | `pandorabox.cupf`, `SmartInfo.cupf`, `RightPopmenu.cupf` 等 | 候选框/右键菜单推荐 |
-
-## 用法
-
-### 自动模式（推荐）
-
-直接对 Claude 说以下任意一句即可：
+## 工作流程
 
 ```
-/oh-my-claudecode:sogou-ad-killer
+扫描发现 → 分类展示 → 用户勾选 → 执行禁用 → 验证结果
 ```
 
-或提及触发词：
-- "帮我去掉搜狗广告"
-- "关闭搜狗输入法所有广告"
-- "sogou ad killer"
+### 第 1 步：扫描发现
 
-Claude 将自动执行：检测安装路径 → 杀进程 → 禁用组件 → 验证结果。
-
-### 手动模式（如果自动执行权限不足）
-
-当自动执行遇到管理员权限问题时，Claude 会生成一个 PowerShell 脚本，请右键以管理员身份运行：
-
-```powershell
-# 右键 → 以管理员身份运行 PowerShell
-.\sogou_ad_cleanup.ps1
-```
-
-## 禁用的完整组件清单
-
-### Components 目录（18 个广告组件）
-
-| 组件目录 | 禁用文件 | 广告类型 |
-|----------|----------|----------|
-| `biz_center/` | `biz_bundle.dll` | 商业推广 |
-| `biz_pdf/` | (整个组件) | PDF 推广 |
-| `game_center/` | `game_center.dll` | 游戏推荐 |
-| `SGDeskControl/` | `SGDeskControl.dll` | 桌面弹窗 |
-| `SGRender/` | `SGRender.exe`, `SGRender.dll`, `SGRender64.dll`, `SGRenderDll.dll`, `libcef.dll` | CEF 广告渲染引擎 |
-| `WriteSpirit/` | `write_spirit.exe`, `spirit_bundle.dll`, `browser_host.dll`, `interceptor.dll` | 写作助手广告 |
-| `AppBox/` | (整个组件) | 应用盒子 |
-| `SkinBox/` | (整个组件) | 皮肤推荐盒子 |
-| `SogouFlash/` | (整个组件) | Flash 广告 |
-| `Theme/` | (整个组件) | 主题推荐 |
-| `SogouComMgr.exe` | (组件管理) | 组件下载/更新 |
-
-### 主安装目录（13 个广告文件）
-
-| 文件 | 功能 |
-|------|------|
-| `SogouCloud.exe` | 云服务（含推荐） |
-| `userNetSchedule.exe` | 广告定时拉取 |
-| `SogouToolkits.exe` | 工具集（含推广入口） |
-| `SGMiniBrowserHelperHost.dll` | 迷你广告浏览器 |
-| `pandorabox.cupf` | 潘多拉魔盒面板 |
-| `skin_recommend.cupf` | 皮肤推荐配置 |
-| `SmartInfo.cupf` | 智能信息（含广告） |
-| `RightPopmenu.cupf` | 右键菜单推广 |
-| `wangzai_guide.cupf` | 旺仔新手指引 |
-| `skin_btn_tips.cupf` | 皮肤按钮提示 |
-| `screencapture.cupf` | 截图工具配置 |
-| `screencapture.exe` | 截图工具 |
-| `richinput.cupf` | 富媒体输入配置 |
-
-## 自动化执行流程
-
-当触发此 skill 时，按以下步骤执行：
-
-### 第 1 步：检测安装
+扫描系统中所有搜狗产品：
 
 ```bash
-# 查找搜狗输入法安装路径（支持多版本）
-find "/c/Program Files" "/c/Program Files (x86)" -maxdepth 2 -type d -name "SogouInput" 2>/dev/null
-ls "/c/Program Files (x86)/SogouInput/"  # 获取版本号
+# 主安装目录
+find "/c/Program Files" "/c/Program Files (x86)" -maxdepth 3 -iname "*sogou*" -type d 2>/dev/null
+
+# 用户数据目录
+find "/c/Users/$USER/AppData" -maxdepth 5 -iname "*sogou*" -type d 2>/dev/null
+
+# 搜狗相关进程
+tasklist 2>/dev/null | grep -i sogou
+
+# 搜狗相关服务
+sc query state= all 2>/dev/null | grep -i sogou
 ```
 
-### 第 2 步：终止进程
+### 第 2 步：分类展示
+
+根据扫描结果，列出搜狗旗下产品。每个产品标注**广告组件数量**和**预计释放内存**。
+
+#### 搜狗产品广告清单
+
+| 产品 | 目录标识 | 广告形式 | 广告组件数 | 预计释放 |
+|------|----------|----------|:--------:|:--------:|
+| ⌨️ 搜狗拼音输入法 | `SogouInput` | 弹窗/候选框/皮肤/游戏/商业推广 | 31+ | ~200MB |
+| ✒️ 搜狗五笔输入法 | `SogouWBInput` | 弹窗/候选框广告 | 15+ | ~80MB |
+| 🌐 搜狗浏览器 | `SogouExplorer` | 首页推广/信息流广告 | 8+ | ~50MB |
+| 📄 搜狗PDF | `sogoupdf` | 升级弹窗/推广 | 3+ | ~10MB |
+| 💾 搜狗磁盘管理 | `kdiskmgr_sogou` | 推广横幅 | 2+ | ~5MB |
+| ✂️ 搜狗截图 | `SogouScreenshot` | 分享页广告 | 2+ | ~5MB |
+
+### 第 3 步：用户勾选
+
+使用 `AskUserQuestion` 让用户勾选要关闭广告的产品。
+
+预设快捷选项：
+
+| 预设名称 | 说明 |
+|----------|------|
+| ⚡ 一键全禁搜狗输入法 | 禁用搜狗拼音输入法全部31+广告组件（最常见需求） |
+| 🔥 全部禁用 | 禁用所有已安装搜狗产品的广告 |
+| ✏️ 手动挑选 | 逐个勾选要禁用广告的产品 |
+
+**重要**：默认选中「一键全禁搜狗输入法」作为推荐预设。
+
+### 第 4 步：执行禁用
+
+#### 4A. 搜狗拼音输入法广告禁用
+
+采用 `.bak` 重命名方式禁用（可逆，不删除文件）。
+
+##### 需终止的进程
 
 ```bash
 taskkill /F /IM SogouImeBroker.exe 2>/dev/null
@@ -123,63 +91,163 @@ taskkill /F /IM userNetSchedule.exe 2>/dev/null
 taskkill /F /IM SogouToolkits.exe 2>/dev/null
 ```
 
-### 第 3 步：禁用 Components 广告组件
+##### Components 目录广告组件（18个）
 
-对每个组件的核心文件执行 `mv <file> <file>.bak`：
-- `Components/biz_center/<ver>/biz_bundle.dll`
-- `Components/game_center/<ver>/game_center.dll`
-- `Components/SGDeskControl/<ver>/SGDeskControl.dll`
-- `Components/SGRender/<ver>/` — 全部 .exe 和核心 .dll
-- `Components/WriteSpirit/<ver>/` — 全部 .exe 和核心 .dll
+```bash
+SOGOU_DIR="C:\Program Files (x86)\SogouInput\<version>"
 
-Component 目录的文件通常不需要管理员权限即可重命名。
+# 商业推广中心
+mv "$SOGOU_DIR/Components/biz_center/<ver>/biz_bundle.dll" "*.bak"
+# 游戏中心
+mv "$SOGOU_DIR/Components/game_center/<ver>/game_center.dll" "*.bak"
+# 桌面弹窗
+mv "$SOGOU_DIR/Components/SGDeskControl/<ver>/SGDeskControl.dll" "*.bak"
+# CEF 广告渲染引擎（最占内存 ~200MB）
+mv "$SOGOU_DIR/Components/SGRender/<ver>/SGRender.exe" "*.bak"
+mv "$SOGOU_DIR/Components/SGRender/<ver>/SGRender.dll" "*.bak"
+mv "$SOGOU_DIR/Components/SGRender/<ver>/SGRender64.dll" "*.bak"
+mv "$SOGOU_DIR/Components/SGRender/<ver>/SGRenderDll.dll" "*.bak"
+mv "$SOGOU_DIR/Components/SGRender/<ver>/libcef.dll" "*.bak"
+# 写作助手
+mv "$SOGOU_DIR/Components/WriteSpirit/<ver>/write_spirit.exe" "*.bak"
+mv "$SOGOU_DIR/Components/WriteSpirit/<ver>/spirit_bundle.dll" "*.bak"
+mv "$SOGOU_DIR/Components/WriteSpirit/<ver>/browser_host.dll" "*.bak"
+mv "$SOGOU_DIR/Components/WriteSpirit/<ver>/interceptor.dll" "*.bak"
+# 其他组件
+mv "$SOGOU_DIR/Components/AppBox/<ver>/"*.dll "*.bak"
+mv "$SOGOU_DIR/Components/SkinBox/<ver>/"*.dll "*.bak"
+mv "$SOGOU_DIR/Components/SogouFlash/<ver>/"*.dll "*.bak"
+mv "$SOGOU_DIR/Components/Theme/<ver>/"*.dll "*.bak"
+mv "$SOGOU_DIR/Components/SogouComMgr.exe" "*.bak"
+```
 
-### 第 4 步：禁用主目录广告文件（需管理员权限）
+##### 主安装目录广告文件（13个）
 
-对主安装目录 `15.x.x.xxxx/` 下的文件执行 `mv <file> <file>.bak`。
+```bash
+# 云服务（含推荐）
+mv "$SOGOU_DIR/SogouCloud.exe" "*.bak"
+# 广告定时拉取
+mv "$SOGOU_DIR/userNetSchedule.exe" "*.bak"
+# 工具集（含推广入口）
+mv "$SOGOU_DIR/SogouToolkits.exe" "*.bak"
+# 迷你广告浏览器
+mv "$SOGOU_DIR/SGMiniBrowserHelperHost.dll" "*.bak"
+# 广告配置面板
+mv "$SOGOU_DIR/pandorabox.cupf" "*.bak"
+mv "$SOGOU_DIR/skin_recommend.cupf" "*.bak"
+mv "$SOGOU_DIR/SmartInfo.cupf" "*.bak"
+mv "$SOGOU_DIR/RightPopmenu.cupf" "*.bak"
+mv "$SOGOU_DIR/wangzai_guide.cupf" "*.bak"
+mv "$SOGOU_DIR/skin_btn_tips.cupf" "*.bak"
+mv "$SOGOU_DIR/screencapture.cupf" "*.bak"
+mv "$SOGOU_DIR/richinput.cupf" "*.bak"
+```
 
-如果遇到 `Permission denied`，使用提权 PowerShell：
+##### 权限处理
+
+- **Components 目录**：通常无需管理员权限
+- **主安装目录**：需管理员权限，使用自提权 PowerShell
 
 ```powershell
 Start-Process powershell -Verb RunAs -Wait -ArgumentList '-NoProfile -Command "cd \"<sogou_path>\"; @(\"file1\",\"file2\",...) | % { if(Test-Path $_) { Rename-Item $_ \"$_.bak\" -Force } }"'
 ```
 
+#### 4B. 搜狗五笔输入法广告禁用
+
+结构类似搜狗拼音，路径为 `C:\Program Files (x86)\SogouWBInput\<version>\`。
+
+```bash
+# 进程终止
+taskkill /F /IM SogouWB*.exe 2>/dev/null
+taskkill /F /IM wb_toolkit.exe 2>/dev/null
+
+# 广告组件（路径结构与拼音类似，组件名可能不同）
+# 扫描 Components 目录，对所有 .dll/.exe 执行 .bak 重命名
+```
+
+#### 4C. 其他搜狗产品广告禁用
+
+##### 搜狗浏览器
+
+```bash
+# 路径：C:\Program Files (x86)\SogouExplorer\
+# 禁用推广组件
+taskkill /F /IM SogouExplorer.exe 2>/dev/null
+mv "C:\Program Files (x86)\SogouExplorer\<ver>\sgspromo.dll" "*.bak"
+mv "C:\Program Files (x86)\SogouExplorer\<ver>\sebundle.dll" "*.bak"
+```
+
+##### 搜狗PDF / 搜狗磁盘管理
+
+```bash
+# 主要关闭自启动和服务
+sc stop sogoupdfsvc 2>/dev/null
+sc config sogoupdfsvc start=disabled 2>/dev/null
+sc stop kdiskmgr_svc 2>/dev/null
+sc config kdiskmgr_svc start=disabled 2>/dev/null
+```
+
 ### 第 5 步：验证
 
 ```bash
-# 统计禁用的文件数
-find "/c/Program Files (x86)/SogouInput/" -name "*.bak" -type f | wc -l
-# 应 ≥ 31
+# 统计禁用的广告文件数
+find "/c/Program Files (x86)/SogouInput" -name "*.bak" -type f 2>/dev/null | wc -l
+find "/c/Program Files (x86)/SogouWBInput" -name "*.bak" -type f 2>/dev/null | wc -l
+
+# 确认关键广告进程未运行
+tasklist 2>/dev/null | grep -iE "SGRender|SogouCloud|write_spirit|userNetSchedule"
+
+# 确认内存释放
+# 重启后 SGRender.exe 不再驻留，释放 ~200MB
 ```
 
-### 第 6 步：提示用户
+---
 
-完成后明确告知用户：
-1. ✅ 已禁用 X 个广告组件
-2. ⚠️ 需要**重启电脑**使改动生效
-3. ⚠️ 建议在搜狗设置中关闭「自动升级」防止广告复活
-4. 📝 如需恢复：将 .bak 文件改回原名
+## 内置预设方案
 
-## 已知问题与注意事项
+### 预设 1：一键全禁搜狗输入法（推荐）
+
+```
+禁用：搜狗拼音输入法全部 31+ 广告组件
+```
+
+触发词：`去搜狗广告` `关闭搜狗广告` `sogou ad killer`
+
+### 预设 2：全部禁用
+
+```
+禁用：所有已安装搜狗产品的广告
+```
+
+触发词：`彻底关闭搜狗广告` `禁用所有搜狗广告`
+
+### 预设 3：手动模式（默认）
+
+扫描 → 展示 → 用户勾选各产品。无特定触发词，默认行为。
+
+---
+
+## 关键陷阱
 
 ### 权限
 - **Components 目录**：通常无需管理员权限
 - **主安装目录** (`Program Files (x86)/SogouInput/<ver>/`)：需要管理员权限
-- 写文件到 Program Files 需要提权，使用 `Start-Process -Verb RunAs` 触发 UAC
+- 使用 `Start-Process -Verb RunAs` 触发 UAC 提权
 
 ### 自动更新
 - 搜狗输入法更新时会重新下载组件，可能恢复广告
-- **务必提醒用户关闭自动更新**：右键输入法状态栏 → 属性设置 → 高级 → 取消勾选「自动升级」
+- **务必提醒用户关闭自动更新**：右键输入法状态栏 → 属性设置 → 高级 → 取消「自动升级」
 
 ### 兼容性
-- **已验证版本**：搜狗拼音 15.9.0.2525（Windows 11）
-- **理论兼容**：15.x 全系列（目录结构相似）
-- **不兼容**：搜狗五笔（目录结构不同，需扩展）
-- 搜狗可能在新版本中变更组件名称和目录结构
+| 产品 | 已验证版本 | 说明 |
+|------|-----------|------|
+| 搜狗拼音 | 15.9.0.2525 | 完整支持 |
+| 搜狗五笔 | 理论兼容 | 目录结构相似，组件名可能不同 |
+| 其他搜狗产品 | 理论兼容 | 需实际测试验证 |
 
 ### 恢复方法
 ```powershell
-# 恢复所有禁用的广告组件
+# 恢复所有禁用的广告组件（搜狗拼音）
 Get-ChildItem "C:\Program Files (x86)\SogouInput" -Recurse -Filter "*.bak" |
     ForEach-Object { Rename-Item $_.FullName $_.FullName.Replace('.bak','') }
 ```
@@ -191,19 +259,18 @@ Get-ChildItem "C:\Program Files (x86)\SogouInput" -Recurse -Filter "*.bak" |
 0.0.0.0 pb.sogou.com
 0.0.0.0 get.sogou.com
 0.0.0.0 config.pinyin.sogou.com
+0.0.0.0 ad.sogou.com
+0.0.0.0 push.sogou.com
 ```
+
+---
 
 ## 验证标准
 
-- `find ... -name "*.bak" | wc -l` ≥ 31
-- 重启后输入法正常使用，无弹窗
-- 候选框无「搜狗搜索」或推广内容
-- 任务管理器中无 `SGRender.exe` / `SogouCloud.exe`
-- 内存占用下降 100-300MB（禁用前 SGRender 常驻）
-
-## 🤝 开源贡献
-
-此 skill 可自由分享到 skill 市场。建议遵循以下规范：
-- 保持 `.bak` 重命名方式（可逆、安全）
-- 新版本搜狗发布后及时更新组件清单
-- 欢迎提交 PR 补充更多版本兼容性
+- ✅ 用户选择禁用的产品：广告组件全部 `.bak` 重命名
+- ✅ 重启后输入法正常使用，无弹窗/推广
+- ✅ 候选框无「搜狗搜索」或推广内容
+- ✅ 任务管理器中无 `SGRender.exe` / `SogouCloud.exe`
+- ✅ 内存占用下降（禁用前 SGRender 常驻 ~200MB）
+- ✅ 未选择的产品不受影响
+- ✅ 所有操作可逆（`.bak` 重命名，不删除文件）
