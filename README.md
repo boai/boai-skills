@@ -1,4 +1,4 @@
-# 🧰 BoAi Skills — 博爱哥哥的 Claude Code 技能合集
+# 🧰 BoAi Skills — boai 的 Claude Code 技能合集
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows-blue.svg)](#)
@@ -66,7 +66,7 @@ boai-skills/
 
 ## 👤 作者
 
-**博爱哥哥 (BoAi)** — [GitHub](https://github.com/boai)
+**博爱 (boai)** — [GitHub](https://github.com/boai)
 
 ## 📄 许可
 
