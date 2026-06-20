@@ -14,6 +14,7 @@
   "license": "MIT",
   "strict": false,
   "skills": [
-    "./skills/sogou-ad-killer"
+    "./skills/sogou-ad-killer",
+    "./skills/360-cleaner"
   ]
 }
