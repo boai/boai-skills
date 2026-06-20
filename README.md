@@ -45,7 +45,12 @@ boai-skills/
 
 ## 作者
 
-**博爱 (boai)** — [GitHub](https://github.com/boai)
+| 角色 | 名称 |
+|------|------|
+| 🧑‍💻 作者 | **博爱 (boai)** — [GitHub](https://github.com/boai) |
+| 🤖 联合创作 | **Claude Code** — powered by Anthropic |
+
+> 本项目由博爱与 Claude Code 协作完成 —— 从需求分析、方案设计到代码编写、文档输出，全流程 AI 协同。
 
 ## 许可
 
