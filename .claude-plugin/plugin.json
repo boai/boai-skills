@@ -4,10 +4,10 @@
   "description": "博爱哥哥的 Claude Code 技能合集——搜狗广告清理、Windows 系统工具等实用技能，持续更新",
   "author": {
     "name": "博爱哥哥 (BoAi)",
-    "url": "https://github.com/boai-dev"
+    "url": "https://github.com/boai"
   },
-  "homepage": "https://github.com/boai-dev/boai-skills",
-  "repository": "https://github.com/boai-dev/boai-skills",
+  "homepage": "https://github.com/boai/boai-skills",
+  "repository": "https://github.com/boai/boai-skills",
   "category": "utility",
   "tags": ["windows", "sogou", "ad-blocker", "input-method", "privacy", "debloat", "boai", "chinese"],
   "platforms": ["win32"],

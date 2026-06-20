@@ -66,7 +66,7 @@ boai-skills/
 
 ## 👤 作者
 
-**博爱哥哥 (BoAi)** — [GitHub](https://github.com/boai-dev)
+**博爱哥哥 (BoAi)** — [GitHub](https://github.com/boai)
 
 ## 📄 许可
 
