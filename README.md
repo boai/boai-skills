@@ -1,4 +1,4 @@
-# 🧰 BoAi Skills — boai 的 Claude Code 技能合集
+# 🧰 boai skills
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows-blue.svg)](#)
