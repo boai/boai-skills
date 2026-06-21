@@ -18,7 +18,7 @@
 
 | 技能 | 说明 | 触发词 |
 |------|------|--------|
-| 🎬 **boai-film-review** | 公众号"博爱光影"影评全流程：选题调研→文章撰写→TMDb配图→Vision识图→封面设计→发布检查 | `写影评` `公众号影评` `博爱光影` `写一篇XX影评` |
+| 🎬 **boai-film-review** | 影评全流程：选题调研→文章撰写→TMDb配图→Vision识图→封面设计→发布检查 | `写影评` `公众号影评` `写一篇XX影评` |
 
 ### 🪟 Windows
 
@@ -49,15 +49,6 @@ boai-skills/
 ├── README.md
 └── LICENSE
 ```
-
-## 作者
-
-| 角色 | 名称 |
-|------|------|
-| 🧑‍💻 作者 | **博爱 (boai)** — [GitHub](https://github.com/boai) |
-| 🤖 联合创作 | **Claude** & **Claude Code** — powered by Anthropic |
-
-> 本项目由博爱与 Claude Code 协作完成 —— 从需求分析、方案设计到代码编写、文档输出，全流程 AI 协同。
 
 ## 许可
 
