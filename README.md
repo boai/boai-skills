@@ -14,6 +14,12 @@
 
 ## 收录技能
 
+### 🌐 通用 / 内容创作
+
+| 技能 | 说明 | 触发词 |
+|------|------|--------|
+| 🎬 **boai-film-review** | 公众号"博爱光影"影评全流程：选题调研→文章撰写→TMDb配图→Vision识图→封面设计→发布检查 | `写影评` `公众号影评` `博爱光影` `写一篇XX影评` |
+
 ### 🪟 Windows
 
 | 技能 | 说明 | 触发词 |
@@ -30,10 +36,11 @@
 
 ## 目录结构
 
-```
+```plaintext
 boai-skills/
 ├── .claude-plugin/plugin.json
 ├── skills/
+│   ├── boai-film-review/SKILL.md
 │   ├── sogou-ad-killer/SKILL.md
 │   ├── 360-cleaner/SKILL.md
 │   ├── mac-wechat-dual-instance/SKILL.md
