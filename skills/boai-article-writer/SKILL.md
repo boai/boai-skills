@@ -1,20 +1,19 @@
 ---
-name: boai-film-review
-description: 微信公众号"博爱光影"影评文章全流程 Skill。覆盖选题调研、分类归档、文章撰写、配图收集、封面设计、发布检查。
+name: boai-article-writer
+description: 微信公众号文章全流程 Skill。覆盖选题调研、分类归档、文章撰写、配图收集、封面设计、发布检查。
 version: 2.2.0
 triggers:
-  - 写影评
-  - 公众号影评
-  - 写一篇影评
-  - 重写影评
-  - 电影评论
+  - 写文章
+  - 公众号文章
+  - 写一篇文章
+  - 重写文章
 metadata:
   brand: 博爱光影
   slug: boai-cinema
   content_root: /Users/boai/Documents/微信公众号/内容/影评/
 ---
 
-# 写公众号影评 — 博爱光影
+# 写公众号文章
 
 为微信公众号"博爱光影"撰写深度影评文章。核心原则：**每篇必须有独特分析角度，不做剧情复述机器；观点必有具体场景/数据/事实支撑。**
 
