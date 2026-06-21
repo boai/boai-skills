@@ -18,7 +18,7 @@
 
 | 技能 | 说明 | 触发词 |
 |------|------|--------|
-| 🎬 **boai-film-review** | 影评全流程：选题调研→文章撰写→TMDb配图→Vision识图→封面设计→发布检查 | `写影评` `公众号影评` `写一篇XX影评` |
+| 📝 **boai-article-writer** | 微信公众号文章全流程：选题调研→文章撰写→配图→封面设计→发布检查 | `写文章` `公众号文章` `写一篇文章` |
 
 ### 🪟 Windows
 
@@ -40,7 +40,7 @@
 boai-skills/
 ├── .claude-plugin/plugin.json
 ├── skills/
-│   ├── boai-film-review/SKILL.md
+│   ├── boai-article-writer/SKILL.md
 │   ├── sogou-ad-killer/SKILL.md
 │   ├── 360-cleaner/SKILL.md
 │   ├── mac-wechat-dual-instance/SKILL.md
