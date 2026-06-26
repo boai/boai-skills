@@ -1,6 +1,6 @@
 {
   "name": "boai-skills",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "boai 的 Claude Code 技能合集——搜狗广告清理、Windows 系统工具、Mac 微信双开/防撤回、Claude token 用量统计等实用技能，持续更新",
   "author": {
     "name": "博爱 (boai)",
@@ -8,11 +8,8 @@
   },
   "homepage": "https://github.com/boai/boai-skills",
   "repository": "https://github.com/boai/boai-skills",
-  "category": "utility",
-  "tags": ["windows", "macos", "sogou", "ad-blocker", "input-method", "privacy", "debloat", "boai", "chinese", "wechat", "anti-recall", "multi-instance", "security", "token", "usage", "claude-code"],
-  "platforms": ["win32", "darwin"],
   "license": "MIT",
-  "strict": false,
+  "keywords": ["claude-code", "plugin", "windows", "macos", "sogou", "ad-blocker", "input-method", "privacy", "debloat", "boai", "chinese", "wechat", "anti-recall", "multi-instance", "security", "token", "usage"],
   "skills": [
     "./skills/boai-article-writer",
     "./skills/sogou-ad-killer",
