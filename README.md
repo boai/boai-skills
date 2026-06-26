@@ -8,39 +8,40 @@
 
 ## 安装
 
+先把本仓库添加为 marketplace（只需做一次）：
+
 ```
-/plugin install boai-skills@claude-plugins-official
-```
-
-## 只想用其中某一个技能？
-
-不装整个合集也行——Claude Code 会自动加载 `~/.claude/skills/` 下的技能，把你要的那个目录放进去即可。下面以 **claude-token-tracker** 为例（换成任意技能名同理）。
-
-> 本仓库为私有仓库，下面的 `git clone` 会走你本机已有的 GitHub 凭证。
-
-**方式一：整仓 clone，只复制需要的技能（最简单）**
-
-```bash
-git clone https://github.com/boai/boai-skills.git
-mkdir -p ~/.claude/skills
-cp -r boai-skills/skills/claude-token-tracker ~/.claude/skills/
+/plugin marketplace add boai/boai-skills
 ```
 
-**方式二：稀疏 clone，只拉单个技能（省空间）**
+> 私有仓库会自动走你本机已有的 git 凭证（和 `git clone` 一样），**无需手动 clone 代码**。
 
-```bash
-git clone --filter=blob:none --sparse https://github.com/boai/boai-skills.git
-cd boai-skills
-git sparse-checkout set skills/claude-token-tracker scripts
-mkdir -p ~/.claude/skills
-cp -r skills/claude-token-tracker ~/.claude/skills/
+### 整包安装（全部技能）
+
+```
+/plugin install boai-skills@boai-skills
 ```
 
-复制完成后**重启 Claude Code**（或打开一次 `/skills` 刷新），技能即出现在列表中；之后提到它的触发词（claude-token-tracker 为 `token 统计` `累计 token` `token usage`）即可使用。例如对 Claude 说「安装 token 统计」，它就会按 `SKILL.md` 把 Stop hook 装好。
+### 只装某一个技能
 
-> 只想对某个项目生效？把目录复制到该项目的 `.claude/skills/` 而非 `~/.claude/skills/` 即可。
+只想要其中一个，就装那一个，互不影响。例如只装 token 统计：
 
-**关于脚本依赖**：个别技能会用到仓库根 `scripts/` 下的脚本。`claude-token-tracker` 的脚本已内联在它的 `SKILL.md` 中（找不到分发文件时自动兜底），单独取用也能正常安装；其它依赖脚本的技能，按方式二把 `scripts` 一并 checkout 即可。
+```
+/plugin install claude-token-tracker@boai-skills
+```
+
+可单独安装的技能：
+
+| 技能 | 安装命令 |
+|------|----------|
+| 📊 claude-token-tracker | `/plugin install claude-token-tracker@boai-skills` |
+| 📝 boai-article-writer | `/plugin install boai-article-writer@boai-skills` |
+| 🧹 sogou-ad-killer | `/plugin install sogou-ad-killer@boai-skills` |
+| 🔧 360-cleaner | `/plugin install 360-cleaner@boai-skills` |
+| 💬 mac-wechat-dual-instance | `/plugin install mac-wechat-dual-instance@boai-skills` |
+| 🔒 mac-wechat-anti-recall | `/plugin install mac-wechat-anti-recall@boai-skills` |
+
+装完执行 `/reload-plugins` 让当前会话立即生效（或重启 Claude Code）。要卸载或管理已装插件，打开 `/plugin` 面板即可。
 
 ## 收录技能
 
@@ -69,7 +70,9 @@ cp -r skills/claude-token-tracker ~/.claude/skills/
 
 ```plaintext
 boai-skills/
-├── .claude-plugin/plugin.json
+├── .claude-plugin/
+│   ├── marketplace.json      # 市场清单：整包 + 每个技能可单独安装
+│   └── plugin.json           # 整包 plugin 清单
 ├── skills/
 │   ├── boai-article-writer/SKILL.md
 │   ├── claude-token-tracker/SKILL.md

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "boai-skills",
+  "description": "boai 的 Claude Code 实用技能合集——可整包安装，也可单独安装其中任意一个技能",
+  "owner": {
+    "name": "博爱 (boai)",
+    "url": "https://github.com/boai"
+  },
+  "plugins": [
+    {
+      "name": "boai-skills",
+      "source": "./",
+      "category": "utility",
+      "tags": ["claude-code", "windows", "macos", "wechat", "token", "boai"],
+      "description": "全部技能一键安装（token 统计 / 文章撰写 / 搜狗去广告 / 360 清理 / 微信双开 / 微信防撤回）"
+    },
+    {
+      "name": "claude-token-tracker",
+      "source": "./",
+      "skills": ["./skills/claude-token-tracker"],
+      "strict": false,
+      "description": "每次回答后自动统计所有历史对话累计消耗的 token，跨会话汇总显示"
+    },
+    {
+      "name": "boai-article-writer",
+      "source": "./",
+      "skills": ["./skills/boai-article-writer"],
+      "strict": false,
+      "description": "微信公众号文章全流程：选题调研→文章撰写→配图→封面设计→发布检查"
+    },
+    {
+      "name": "sogou-ad-killer",
+      "source": "./",
+      "skills": ["./skills/sogou-ad-killer"],
+      "strict": false,
+      "description": "扫描所有搜狗产品，手动勾选关闭广告，一键全禁预设"
+    },
+    {
+      "name": "360-cleaner",
+      "source": "./",
+      "skills": ["./skills/360-cleaner"],
+      "strict": false,
+      "description": "扫描系统所有 360 产品，手动勾选卸载，含快捷预设"
+    },
+    {
+      "name": "mac-wechat-dual-instance",
+      "source": "./",
+      "skills": ["./skills/mac-wechat-dual-instance"],
+      "strict": false,
+      "description": "macOS 微信双开/多开，无需禁 SIP，原生 Apple Silicon"
+    },
+    {
+      "name": "mac-wechat-anti-recall",
+      "source": "./",
+      "skills": ["./skills/mac-wechat-anti-recall"],
+      "strict": false,
+      "description": "macOS 微信防撤回，全消息类型支持，附带去日志/去更新"
+    }
+  ]
+}
