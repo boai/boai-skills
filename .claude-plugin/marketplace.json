@@ -16,10 +16,8 @@
     },
     {
       "name": "claude-token-tracker",
-      "source": "./",
-      "skills": ["./skills/claude-token-tracker"],
-      "strict": false,
-      "description": "每次回答后自动统计所有历史对话累计消耗的 token，跨会话汇总显示"
+      "source": "./plugins/claude-token-tracker",
+      "description": "每轮回答结束自动显示 token 用量统计（当前对话/今日/本月/历史），无需触发词，重启后自动生效"
     },
     {
       "name": "boai-article-writer",

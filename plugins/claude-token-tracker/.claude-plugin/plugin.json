@@ -1,0 +1,12 @@
+{
+  "name": "claude-token-tracker",
+  "version": "1.0.0",
+  "description": "每轮回答结束自动显示 token 用量统计（当前对话 / 今日 / 本月 / 历史全部），无需触发词。安装并重启后由 Stop hook 自动生效。",
+  "author": {
+    "name": "博爱 (boai)",
+    "url": "https://github.com/boai"
+  },
+  "homepage": "https://github.com/boai/boai-skills",
+  "license": "MIT",
+  "keywords": ["claude-code", "token", "usage", "hook", "stop-hook", "boai"]
+}

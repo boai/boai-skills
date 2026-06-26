@@ -16,25 +16,26 @@
 
 > 私有仓库会自动走你本机已有的 git 凭证（和 `git clone` 一样），**无需手动 clone 代码**。
 
-### 整包安装（全部技能）
-
-```
-/plugin install boai-skills@boai-skills
-```
-
-### 只装某一个技能
-
-只想要其中一个，就装那一个，互不影响。例如只装 token 统计：
+### ⭐ claude-token-tracker —— 自动 token 统计（无需触发词）
 
 ```
 /plugin install claude-token-tracker@boai-skills
 ```
 
-可单独安装的技能：
+装完后**重启 Claude Code**（或 `/reload-plugins`）。之后**正常对话即可，每轮回答结束会自动打印 token 统计**（当前对话 / 今日 / 本月 / 历史全部）——它是一个 Stop hook，**不需要你说任何提示词**。
+
+### 其他技能（提到触发词时启用）
+
+整包安装全部技能：
+
+```
+/plugin install boai-skills@boai-skills
+```
+
+或只装某一个：
 
 | 技能 | 安装命令 |
 |------|----------|
-| 📊 claude-token-tracker | `/plugin install claude-token-tracker@boai-skills` |
 | 📝 boai-article-writer | `/plugin install boai-article-writer@boai-skills` |
 | 🧹 sogou-ad-killer | `/plugin install sogou-ad-killer@boai-skills` |
 | 🔧 360-cleaner | `/plugin install 360-cleaner@boai-skills` |
@@ -43,14 +44,19 @@
 
 装完执行 `/reload-plugins` 让当前会话立即生效（或重启 Claude Code）。要卸载或管理已装插件，打开 `/plugin` 面板即可。
 
-## 收录技能
+## 收录内容
 
-### 🌐 通用 / 内容创作
+### ⚙️ 自动运行（hook，无需触发词）
+
+| 插件 | 说明 | 启用方式 |
+|------|------|----------|
+| 📊 **claude-token-tracker** | 每轮回答结束自动显示 token 用量：当前对话 / 今日 / 本月 / 历史全部，各含明细+合计 | 装完重启即自动运行 |
+
+### 🌐 通用 / 内容创作（技能，提到触发词时启用）
 
 | 技能 | 说明 | 触发词 |
 |------|------|--------|
 | 📝 **boai-article-writer** | 微信公众号文章全流程：选题调研→文章撰写→配图→封面设计→发布检查 | `写文章` `公众号文章` `写一篇文章` |
-| 📊 **claude-token-tracker** | 每次回答后自动统计所有历史对话累计消耗的 token，跨会话汇总显示 | `token 统计` `累计 token` `token usage` |
 
 ### 🪟 Windows
 
@@ -71,18 +77,21 @@
 ```plaintext
 boai-skills/
 ├── .claude-plugin/
-│   ├── marketplace.json      # 市场清单：整包 + 每个技能可单独安装
-│   └── plugin.json           # 整包 plugin 清单
-├── skills/
+│   ├── marketplace.json      # 市场清单：整包 + 各技能/插件可单独安装
+│   └── plugin.json           # 整包 plugin 清单（5 个触发式技能）
+├── plugins/
+│   └── claude-token-tracker/ # 自动 token 统计（Stop hook 插件）
+│       ├── .claude-plugin/plugin.json
+│       ├── hooks/hooks.json
+│       └── scripts/token-usage-summary.py
+├── skills/                   # 触发式技能
 │   ├── boai-article-writer/SKILL.md
-│   ├── claude-token-tracker/SKILL.md
 │   ├── sogou-ad-killer/SKILL.md
 │   ├── 360-cleaner/SKILL.md
 │   ├── mac-wechat-dual-instance/SKILL.md
 │   └── mac-wechat-anti-recall/SKILL.md
-├── scripts/
-│   ├── sogou_ad_killer.ps1
-│   └── token-usage-summary.py
+├── scripts/                  # Windows 脚本等
+│   └── sogou_ad_killer.ps1
 ├── README.md
 └── LICENSE
 ```

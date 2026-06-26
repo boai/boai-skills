@@ -1,0 +1,17 @@
+{
+  "description": "每轮回答结束自动显示 token 用量统计（当前对话 / 今日 / 本月 / 历史全部）",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/token-usage-summary.py"],
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

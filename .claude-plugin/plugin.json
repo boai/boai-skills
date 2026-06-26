@@ -1,7 +1,7 @@
 {
   "name": "boai-skills",
-  "version": "1.3.0",
-  "description": "boai 的 Claude Code 技能合集——搜狗广告清理、Windows 系统工具、Mac 微信双开/防撤回、Claude token 用量统计等实用技能，持续更新",
+  "version": "1.4.0",
+  "description": "boai 的 Claude Code 技能合集——搜狗广告清理、Windows 系统工具、Mac 微信双开/防撤回等实用技能，持续更新（token 用量统计见独立插件 claude-token-tracker）",
   "author": {
     "name": "博爱 (boai)",
     "url": "https://github.com/boai"
@@ -9,13 +9,12 @@
   "homepage": "https://github.com/boai/boai-skills",
   "repository": "https://github.com/boai/boai-skills",
   "license": "MIT",
-  "keywords": ["claude-code", "plugin", "windows", "macos", "sogou", "ad-blocker", "input-method", "privacy", "debloat", "boai", "chinese", "wechat", "anti-recall", "multi-instance", "security", "token", "usage"],
+  "keywords": ["claude-code", "plugin", "windows", "macos", "sogou", "ad-blocker", "input-method", "privacy", "debloat", "boai", "chinese", "wechat", "anti-recall", "multi-instance", "security"],
   "skills": [
     "./skills/boai-article-writer",
     "./skills/sogou-ad-killer",
     "./skills/360-cleaner",
     "./skills/mac-wechat-dual-instance",
-    "./skills/mac-wechat-anti-recall",
-    "./skills/claude-token-tracker"
+    "./skills/mac-wechat-anti-recall"
   ]
 }
