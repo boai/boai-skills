@@ -19,6 +19,7 @@
 | 技能 | 说明 | 触发词 |
 |------|------|--------|
 | 📝 **boai-article-writer** | 微信公众号文章全流程：选题调研→文章撰写→配图→封面设计→发布检查 | `写文章` `公众号文章` `写一篇文章` |
+| 📊 **claude-token-tracker** | 每次回答后自动统计所有历史对话累计消耗的 token，跨会话汇总显示 | `token 统计` `累计 token` `token usage` |
 
 ### 🪟 Windows
 
@@ -41,11 +42,14 @@ boai-skills/
 ├── .claude-plugin/plugin.json
 ├── skills/
 │   ├── boai-article-writer/SKILL.md
+│   ├── claude-token-tracker/SKILL.md
 │   ├── sogou-ad-killer/SKILL.md
 │   ├── 360-cleaner/SKILL.md
 │   ├── mac-wechat-dual-instance/SKILL.md
 │   └── mac-wechat-anti-recall/SKILL.md
 ├── scripts/
+│   ├── sogou_ad_killer.ps1
+│   └── token-usage-summary.py
 ├── README.md
 └── LICENSE
 ```
