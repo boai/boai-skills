@@ -40,9 +40,9 @@
   .cover .en { font-size: 9.5pt; letter-spacing: 8px; color: #9fd6bd; text-transform: uppercase; margin-bottom: 6mm; }
   .cover .slogan { font-size: 13pt; color: #ffe9c9; font-weight: 600; letter-spacing: 1px; margin-bottom: 9mm; }
   .cover .slogan .q { color: #ffd9a8; }
-  .cover .feats { display: flex; gap: 4mm; width: 80%; }
-  .cover .feat { flex: 1; text-align: center; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); border-radius: 2.5mm; padding: 3mm 2mm; font-size: 9pt; }
-  .cover .feat .n { display: block; font-size: 16pt; font-weight: 700; color: #ffd9a8; line-height: 1.25; }
+  .cover .feats { font-size: 9.5pt; color: #9fd6bd; letter-spacing: 1px; }
+  .cover .feats b { color: #ffd9a8; font-weight: 700; }
+  .cover .feats .sep { margin: 0 3mm; color: rgba(159,214,189,.45); }
   /* 署名：右下角一行小字英文，与英文副题同色 */
   .cover .sign { position: absolute; bottom: 6mm; right: 8mm; font-size: 8.5pt; letter-spacing: 1px; color: #9fd6bd; z-index: 3; }
   .cover .date { position: absolute; bottom: 6.5mm; left: 8mm; font-size: 8pt; color: rgba(159,214,189,.8); z-index: 3; }
@@ -125,12 +125,8 @@
     <div class="en">【填】ZHAOQING · TRAVEL GUIDE</div>
     <!-- 【填】当地官方旅游宣传语（检索「城市名 旅游宣传口号」）+ 配套 tagline -->
     <div class="slogan">「<span class="q">【填】官方宣传语</span>」<span style="color:#9fd6bd;font-size:10.5pt">　【填】tagline</span></div>
-    <!-- 【填】3 个数字特征条：重点景区数量 / 美食数量 / 行程方案数 -->
-    <div class="feats">
-      <div class="feat"><span class="n">2</span>个 5A 景区</div>
-      <div class="feat"><span class="n">8</span>道必吃美食</div>
-      <div class="feat"><span class="n">3</span>条行程方案</div>
-    </div>
+    <!-- 【填】一行安静的数字信息：重点景区数 / 美食数 / 行程方案数，无边框无底色 -->
+    <div class="feats"><b>2</b> 个 5A 景区<span class="sep">·</span><b>8</b> 道必吃美食<span class="sep">·</span><b>3</b> 条行程方案</div>
     <!-- 【填】更新日期，不写固定行程天数 -->
     <div class="date">【填】2026 年 8 月更新 · 价格以官方当日公布为准</div>
     <!-- 署名：右下角一行英文，必须保留 -->
