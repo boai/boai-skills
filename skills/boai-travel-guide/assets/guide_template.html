@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>旅游攻略模板</title>
+<!--
+  ============================================================
+  旅游攻略 PDF 模板（boai-travel-guide）
+  ============================================================
+  用法：复制本文件为临时 HTML，按下方【填】注释替换各章节内容，
+  再用 scripts/html2pdf.sh 转成 PDF。
+  规则：
+  1. 保留全部 CSS，只替换内容——设计已调优，改 CSS 容易翻车
+  2. 章节顺序固定：封面→行程总览→景点深度榜→美食地图→住宿精选
+     →(充电规划，仅电车自驾保留)→费用预算→实用贴士→信息来源
+  3. 非电车出行：删除"充电规划"整章，并把后续章节号 -1
+  4. 纯 CSS 排版，不要引入外网图片（封面用渐变设计）
+  5. 表格/徽章/星级样式照用：badge b-free(免费) b-fee(收费)
+     b-hot(必停) b-tip(提示)；星级用 .stars 类 ★★★★☆
+  ============================================================
+-->
+<style>
+  @page { size: A4; margin: 15mm 13mm; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; color: #2b2b2b; margin: 0; font-size: 10.5pt; line-height: 1.65; }
+  .cover { height: 257mm; background: linear-gradient(160deg, #0b3d2e 0%, #11664b 45%, #1d8a63 100%); color: #fff; border-radius: 6mm; padding: 30mm 20mm; position: relative; page-break-after: always; overflow: hidden; }
+  .cover::after { content: ""; position: absolute; right: -40mm; top: -40mm; width: 120mm; height: 120mm; border: 2mm solid rgba(255,255,255,.18); border-radius: 50%; }
+  .cover::before { content: ""; position: absolute; right: 10mm; bottom: 20mm; width: 70mm; height: 70mm; border: 1.5mm solid rgba(255,255,255,.14); border-radius: 50%; }
+  .cover .kicker { letter-spacing: 4px; font-size: 11pt; color: #ffd9a8; margin-bottom: 8mm; }
+  .cover h1 { font-size: 42pt; margin: 0 0 4mm; letter-spacing: 2px; }
+  .cover .sub { font-size: 15pt; color: #ffe9c9; margin-bottom: 12mm; }
+  .cover .route { font-size: 12pt; color: #e8f5ee; background: rgba(255,255,255,.12); border-radius: 3mm; padding: 5mm 6mm; margin-bottom: 10mm; line-height: 1.9; }
+  .cover .facts { display: flex; flex-wrap: wrap; gap: 4mm; }
+  .cover .fact { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); border-radius: 2.5mm; padding: 3mm 5mm; font-size: 10pt; }
+  .cover .date { position: absolute; bottom: 22mm; left: 20mm; font-size: 10.5pt; color: #cfe8dd; }
+  h2.ch { font-size: 17pt; color: #0b3d2e; border-left: 4mm solid #e8642a; padding-left: 4mm; margin: 10mm 0 5mm; }
+  h2.ch .no { display: inline-block; background: #e8642a; color: #fff; font-size: 11pt; border-radius: 1.5mm; padding: 0.5mm 2.5mm; margin-right: 3mm; vertical-align: 2px; }
+  h3 { font-size: 12.5pt; color: #0f6e4f; margin: 7mm 0 2.5mm; }
+  p { margin: 1.5mm 0; }
+  table { width: 100%; border-collapse: collapse; margin: 3mm 0; font-size: 9.8pt; }
+  th { background: #0f6e4f; color: #fff; padding: 2.2mm 2.5mm; text-align: left; font-weight: 600; }
+  td { padding: 2.2mm 2.5mm; border-bottom: 1px solid #e3e0d8; vertical-align: top; }
+  tr:nth-child(even) td { background: #f6f3ec; }
+  .stars { color: #e8642a; letter-spacing: 1px; white-space: nowrap; }
+  .badge { display: inline-block; font-size: 8.5pt; border-radius: 1.5mm; padding: 0.3mm 2mm; margin-right: 1.5mm; }
+  .b-free { background: #e3f4ec; color: #0f6e4f; }
+  .b-fee { background: #fdeee4; color: #c0551c; }
+  .b-hot { background: #fdeaea; color: #c0392b; }
+  .b-tip { background: #eef2fb; color: #34528c; }
+  .daycard { border: 1px solid #dcd7cc; border-radius: 3mm; padding: 4mm 5mm; margin: 3mm 0; background: #fffdf9; page-break-inside: avoid; }
+  .daycard .daytitle { font-size: 12.5pt; font-weight: 700; color: #fff; background: linear-gradient(90deg, #0f6e4f, #1d8a63); border-radius: 2mm; padding: 1.8mm 4mm; display: inline-block; margin-bottom: 2.5mm; }
+  .daycard .d0 { background: linear-gradient(90deg, #4a4a5a, #6a6a7c); }
+  .tline { width: 100%; border-collapse: collapse; }
+  .tline td { border: none; padding: 1.2mm 2mm; font-size: 9.8pt; }
+  .tline tr:nth-child(even) td { background: transparent; }
+  .tline .t { color: #0f6e4f; font-weight: 700; white-space: nowrap; width: 27mm; }
+  .card { border: 1px solid #dcd7cc; border-radius: 3mm; padding: 3.5mm 4.5mm; margin: 3mm 0; page-break-inside: avoid; background: #fffdf9; }
+  .card .name { font-size: 12pt; font-weight: 700; color: #0b3d2e; }
+  .grid2 { display: flex; gap: 4mm; }
+  .grid2 > div { flex: 1; }
+  ul { margin: 2mm 0; padding-left: 6mm; }
+  li { margin: 1.2mm 0; }
+  .rule { border-left: 1mm solid #e8642a; background: #fdf3ec; border-radius: 1.5mm; padding: 2.5mm 3.5mm; margin: 3mm 0; }
+  .warn { border-left: 1mm solid #c0392b; background: #fdeeee; border-radius: 1.5mm; padding: 2.5mm 3.5mm; margin: 3mm 0; }
+  .sources { font-size: 8.5pt; color: #666; }
+  .sources a { color: #0f6e4f; text-decoration: none; word-break: break-all; }
+  .pagebreak { page-break-before: always; }
+  .kv { width: 100%; border-collapse: collapse; }
+  .kv td { border: 1px solid #e3e0d8; padding: 2mm 3mm; font-size: 9.8pt; }
+  .kv tr:nth-child(even) td { background: #f6f3ec; }
+  .kv .k { background: #eef2ee; font-weight: 700; width: 30mm; color: #0b3d2e; }
+  .tag { display: inline-block; background: #0f6e4f; color: #fff; border-radius: 1.2mm; font-size: 8pt; padding: 0.3mm 1.8mm; margin-left: 1.5mm; vertical-align: 2px; }
+</style>
+</head>
+<body>
+
+<!-- ==================== 封面 ==================== -->
+<div class="cover">
+  <!-- 【填】kicker：如"广州出发 · 电车自驾 · 周末游" -->
+  <div class="kicker">【填】出发地 · 出行方式 · 行程性质</div>
+  <!-- 【填】城市名 -->
+  <h1>【目的地】</h1>
+  <!-- 【填】副标题：如"嗦粉之城 · 山水龙城 ｜ 2日2晚攻略" -->
+  <div class="sub">【填】目的地主题词 ｜ N日M晚攻略</div>
+  <!-- 【填】路线行：交通路线 + 里程/时长/时间安排 -->
+  <div class="route">
+    🚗 【填】路线：出发地 —高速名→ 中转点 —→ 目的地<br>
+    单程约 XXX km ｜ 驾驶约 X.X h + 充电 XX min ｜ 出发日出发 · 返程日到家
+  </div>
+  <!-- 【填】4 个亮点徽章：如 电车友好 / 景点免费 / 招牌美食 / 人均预算 -->
+  <div class="facts">
+    <div class="fact">🔌 【填】亮点 1</div>
+    <div class="fact">🆓 【填】亮点 2</div>
+    <div class="fact">🍜 【填】亮点 3</div>
+    <div class="fact">💴 【填】亮点 4</div>
+  </div>
+  <!-- 【填】具体日期（含星期） -->
+  <div class="date">【填】XXXX.X.XX（周五）晚出发 — X.XX（周日）晚返回</div>
+</div>
+
+<!-- ==================== 第一章 行程总览 ==================== -->
+<h2 class="ch"><span class="no">1</span>行程总览</h2>
+
+<!-- 【填】每个 Day 一个 daycard；首日赶路用 d0 深色标题，游玩日用默认绿色标题 -->
+<div class="daycard">
+  <div class="daytitle d0">Day 0 · 【填】出发日星期 X｜出发地 → 目的地（约 XXX km）</div>
+  <table class="tline">
+    <tr><td class="t">【时间】</td><td>【填】安排（🚩 充电点、⚠️ 时间节点按阶段 3 规范标记）</td></tr>
+  </table>
+  <div class="rule">💡 【填】本日备选方案（如"满桩就下高速去市区充"）</div>
+</div>
+
+<div class="daycard">
+  <div class="daytitle">Day 1 · 【填】星期 X｜主题</div>
+  <table class="tline">
+    <tr><td class="t">【时间】</td><td>【填】安排</td></tr>
+  </table>
+</div>
+
+<div class="daycard">
+  <div class="daytitle">Day 2 · 【填】星期 X｜主题 + 返程</div>
+  <table class="tline">
+    <tr><td class="t">【时间】</td><td>【填】安排（返程日倒推出发时间）</td></tr>
+  </table>
+  <div class="warn">⚠️ 【填】风险提醒（如"续航低于 XXX 需两充"）</div>
+</div>
+
+<h3>交通速查</h3>
+<table class="kv">
+  <tr><td class="k">路线</td><td>【填】高速/班次路线，以实时导航为准</td></tr>
+  <tr><td class="k">驾驶时长</td><td>【填】单程时长 + 充电时间 + 拥堵提醒</td></tr>
+  <tr><td class="k">高速费</td><td>【填】单程/往返费用</td></tr>
+  <tr><td class="k">电费/车费</td><td>【填】全程成本（电车对比油车）</td></tr>
+  <tr><td class="k">备选方案</td><td>【填】中途过夜等 Plan B</td></tr>
+</table>
+
+<!-- ==================== 第二章 景点深度榜 ==================== -->
+<h2 class="ch pagebreak"><span class="no">2</span>景点深度榜</h2>
+<table>
+  <tr><th style="width:7mm">排名</th><th>景点</th><th>门票</th><th>推荐</th><th>一句话亮点</th></tr>
+  <!-- 【填】每个景点一行：badge b-free/b-fee + b-tip（闭馆日等）；星级 .stars -->
+  <tr><td>1</td><td><b>【景点名】</b></td><td><span class="badge b-free">免费</span></td><td class="stars">★★★★★</td><td>【一句话亮点】</td></tr>
+</table>
+
+<div class="warn">⏭️ <b>【填】主动放弃项：</b>太远/时间不够的景点列出并说明理由</div>
+
+<div class="grid2">
+  <div class="card">
+    <div class="name">【景点 1】<span class="tag">【建议时段】</span></div>
+    <ul><li>【填】必打卡点、游览时长、出入口、费用明细</li></ul>
+  </div>
+  <div class="card">
+    <div class="name">【景点 2】<span class="tag">【建议时段】</span></div>
+    <ul><li>【填】⚠️ 关键时间节点写这里</li></ul>
+  </div>
+</div>
+
+<!-- ==================== 第三章 美食地图 ==================== -->
+<h2 class="ch"><span class="no">3</span>美食地图</h2>
+<div class="card">
+  <div class="name">【填】头牌美食<span class="tag">人均 XX 元</span></div>
+  <ul>
+    <li><b>老店名单：</b>【填】本地人认可的老店名</li>
+    <li><b>吃法要点：</b>【填】辣度/必加配料/搭配解腻</li>
+    <li>【填】排队/售罄规律（如"11 点前去"）</li>
+  </ul>
+</div>
+<div class="card">
+  <div class="name">【填】大菜/正餐<span class="tag">晚餐/夜宵</span></div>
+  <ul><li>【填】店名 + 必点菜</li></ul>
+</div>
+<div class="grid2">
+  <div class="card">
+    <div class="name">【填】市场/早市</div>
+    <ul><li>【填】摊位与单品价格</li></ul>
+  </div>
+  <div class="card">
+    <div class="name">【填】夜市/小吃街</div>
+    <ul><li>【填】单品与招牌</li></ul>
+  </div>
+</div>
+<div class="card">
+  <div class="name">🎁 伴手礼清单</div>
+  <ul><li>【填】可带走的特产</li></ul>
+</div>
+
+<!-- ==================== 第四章 住宿精选 ==================== -->
+<h2 class="ch pagebreak"><span class="no">4</span>住宿精选（【填】晚数：周五 + 周六）</h2>
+<table>
+  <tr><th>档位</th><th>区域 / 参考</th><th>价格</th><th>适合</th></tr>
+  <!-- 【填】3 档：舒适 / 经济 / 高端 -->
+  <tr><td>舒适档</td><td>【填】商圈/连锁名</td><td>【填】价格</td><td>【填】理由</td></tr>
+</table>
+<div class="rule">🔌 <b>【填】选房第一原则：</b>（电车场景：优先带充电桩酒店；其他场景换成位置/安静等原则）</div>
+
+<!-- ==================== 第五章 充电规划（仅电车自驾保留，否则删除并重编号） ==================== -->
+<h2 class="ch"><span class="no">5</span>充电规划（电车专项）</h2>
+<table>
+  <tr><th>站点</th><th>位置</th><th>桩况 / 实测</th><th>建议</th></tr>
+  <!-- 【填】沿途与市区各充电点：去程必停/备选/返程首选/市区超充/酒店慢充 -->
+  <tr><td><b>【服务区/站点名】</b></td><td>【高速名】</td><td>【桩数/实测功率】</td><td><span class="badge b-hot">去程必停</span>【说明】</td></tr>
+</table>
+<h3>电车铁律</h3>
+<ul>
+  <li><b>30% 就找桩</b>，不等报警；高速续航按 CLTC <b>7 折</b>规划，预留 20% 冗余</li>
+  <li><b>充到 80-90% 就拔枪</b>，末段充电慢；30-40 分钟正好吃饭休息</li>
+  <li>出发前：高德「新能源模式」看沿途桩位/电价/空闲；APP 备好 <b>特来电 + 星星充电 + 国家电网 e充电 + 小桔</b>，提前完成实名和免密支付</li>
+  <li>错峰：<b>10:00-15:00 最挤</b>；清晨、午后 14-16 点、22 点后空闲；饭点前后半小时最尴尬</li>
+  <li>服务区排队超 30 分钟 → <b>下高速去市区/县城充</b>（出口 3-5 km 内商场桩），耗时反而更短</li>
+  <li>【填】季节专项提醒（夏天找阴凉/冬天电池预热）</li>
+</ul>
+
+<!-- ==================== 第六章 费用预算 ==================== -->
+<h2 class="ch pagebreak"><span class="no">6</span>费用预算</h2>
+<table>
+  <tr><th>项目</th><th>明细</th><th>金额</th></tr>
+  <tr><td>电费/车费</td><td>【填】</td><td>【填】约 XX 元</td></tr>
+  <tr><td>高速费</td><td>【填】</td><td>【填】约 XX 元</td></tr>
+  <tr><td>住宿</td><td>【填】</td><td>【填】经济 XX / 舒适 XX 元起</td></tr>
+  <tr><td>餐饮</td><td>【填】</td><td>人均约 XX 元</td></tr>
+  <tr><td>门票/市内</td><td>【填】</td><td>约 XX 元</td></tr>
+</table>
+<div class="card">
+  <div class="name">人均预算（【填】人数）</div>
+  <ul>
+    <li><b>经济版 ≈ XXX 元/人</b>：【填】取舍</li>
+    <li><b>舒适版 ≈ XXX 元/人</b>：【填】取舍</li>
+    <li>【填】对比项（如电车 vs 油车成本）</li>
+  </ul>
+</div>
+
+<!-- ==================== 第七章 实用贴士 ==================== -->
+<h2 class="ch"><span class="no">7</span>实用贴士</h2>
+<ul>
+  <li><b>天气：</b>【填】当期天气与应对（防晒/衣物/补水）</li>
+  <li><b>【填】主题避坑：</b>【填】辣度/砍价/黄牛等本地化提醒</li>
+  <li><b>时间节点：</b>【填】⚠️ 全部关键时间节点在这里再列一遍（停运/末班/闭馆/亮灯/场次）</li>
+  <li><b>市内交通：</b>【填】打车/共享/公交建议，自驾场景提醒"车停酒店、市内别开车"</li>
+  <li><b>充电错峰：</b>【填】结合行程的错峰安排（电车场景）</li>
+  <li><b>出发前：</b>【填】胎压/满电/ETC/证件/随车药品清单</li>
+</ul>
+
+<p class="sources" style="margin-top:8mm"><b>信息来源（【填】检索年月）：</b><br>
+· 【填】<a href="【URL】">【来源标题】</a><br>
+· 【填】每条调研来源一行，保留完整链接<br>
+提示：价格与开放时间为公开渠道汇总，出行前以导航/官方最新信息为准。</p>
+
+</body>
+</html>

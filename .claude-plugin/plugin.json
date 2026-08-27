@@ -1,7 +1,7 @@
 {
   "name": "boai-skills",
-  "version": "1.4.0",
-  "description": "boai 的 Claude Code 技能合集——搜狗广告清理、Windows 系统工具、Mac 微信双开/防撤回等实用技能，持续更新（token 用量统计见独立插件 claude-token-tracker）",
+  "version": "1.5.0",
+  "description": "boai 的 Claude Code 技能合集——公众号文章/影评/旅游攻略、搜狗广告清理、Windows 系统工具、Mac 微信双开/防撤回等实用技能，持续更新（token 用量统计见独立插件 claude-token-tracker）",
   "author": {
     "name": "博爱 (boai)",
     "url": "https://github.com/boai"
@@ -9,9 +9,11 @@
   "homepage": "https://github.com/boai/boai-skills",
   "repository": "https://github.com/boai/boai-skills",
   "license": "MIT",
-  "keywords": ["claude-code", "plugin", "windows", "macos", "sogou", "ad-blocker", "input-method", "privacy", "debloat", "boai", "chinese", "wechat", "anti-recall", "multi-instance", "security"],
+  "keywords": ["claude-code", "plugin", "windows", "macos", "sogou", "ad-blocker", "input-method", "privacy", "debloat", "boai", "chinese", "wechat", "anti-recall", "multi-instance", "security", "travel", "guide", "itinerary", "film-review"],
   "skills": [
     "./skills/boai-article-writer",
+    "./skills/boai-film-review",
+    "./skills/boai-travel-guide",
     "./skills/sogou-ad-killer",
     "./skills/360-cleaner",
     "./skills/mac-wechat-dual-instance",
