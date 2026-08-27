@@ -37,6 +37,8 @@
 | 技能 | 安装命令 |
 |------|----------|
 | 📝 boai-article-writer | `/plugin install boai-article-writer@boai-skills` |
+| 🎬 boai-film-review | `/plugin install boai-film-review@boai-skills` |
+| ✈️ boai-travel-guide | `/plugin install boai-travel-guide@boai-skills` |
 | 🧹 sogou-ad-killer | `/plugin install sogou-ad-killer@boai-skills` |
 | 🔧 360-cleaner | `/plugin install 360-cleaner@boai-skills` |
 | 💬 mac-wechat-dual-instance | `/plugin install mac-wechat-dual-instance@boai-skills` |
@@ -57,6 +59,13 @@
 | 技能 | 说明 | 触发词 |
 |------|------|--------|
 | 📝 **boai-article-writer** | 微信公众号文章全流程：选题调研→文章撰写→配图→封面设计→发布检查 | `写文章` `公众号文章` `写一篇文章` |
+| 🎬 **boai-film-review** | 公众号"博爱光影"影评全流程：选题调研→分类归档→撰写→配图→封面设计→发布检查 | `写影评` `公众号影评` `博爱光影` |
+
+### ✈️ 出行（技能，提到触发词时启用）
+
+| 技能 | 说明 | 触发词 |
+|------|------|--------|
+| ✈️ **boai-travel-guide** | 旅游攻略生成：行程编排 + 联网调研（路线/充电/景点/美食/住宿/预算）+ 精排版 PDF 交付，支持电车自驾充电规划 | `旅游攻略` `自驾` `周末去哪玩` `X日游` `行程规划` |
 
 ### 🪟 Windows
 
@@ -78,7 +87,7 @@
 boai-skills/
 ├── .claude-plugin/
 │   ├── marketplace.json      # 市场清单：整包 + 各技能/插件可单独安装
-│   └── plugin.json           # 整包 plugin 清单（5 个触发式技能）
+│   └── plugin.json           # 整包 plugin 清单（7 个触发式技能）
 ├── plugins/
 │   └── claude-token-tracker/ # 自动 token 统计（Stop hook 插件）
 │       ├── .claude-plugin/plugin.json
@@ -86,6 +95,11 @@ boai-skills/
 │       └── scripts/token-usage-summary.py
 ├── skills/                   # 触发式技能
 │   ├── boai-article-writer/SKILL.md
+│   ├── boai-film-review/SKILL.md
+│   ├── boai-travel-guide/
+│   │   ├── SKILL.md
+│   │   ├── assets/guide_template.html   # 攻略 PDF 精排版模板
+│   │   └── scripts/html2pdf.sh          # 无头 Chrome 转 PDF
 │   ├── sogou-ad-killer/SKILL.md
 │   ├── 360-cleaner/SKILL.md
 │   ├── mac-wechat-dual-instance/SKILL.md
