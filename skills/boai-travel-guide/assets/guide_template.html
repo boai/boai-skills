@@ -5,59 +5,74 @@
 <title>旅游攻略模板</title>
 <!--
   ============================================================
-  旅游攻略 PDF 模板（boai-travel-guide）
+  旅游攻略 PDF 模板 v2（boai-travel-guide）
   ============================================================
-  用法：复制本文件为临时 HTML，按下方【填】注释替换各章节内容，
+  用法：复制本文件为临时 HTML，按【填】注释替换各章节内容，
   再用 scripts/html2pdf.sh 转成 PDF。
   规则：
   1. 保留全部 CSS，只替换内容——设计已调优，改 CSS 容易翻车
-  2. 章节顺序固定：封面→行程总览→景点深度榜→美食地图→住宿精选
-     →(充电规划，仅电车自驾保留)→费用预算→实用贴士→信息来源
-  3. "充电规划"章按交通方式处理：纯电自驾保留；混动删除并
-     把补能要点并进实用贴士；油车/高铁/飞机删除，后续章节号 -1
-  4. 纯 CSS 排版，不要引入外网图片（封面用渐变设计）
-  5. 表格/徽章/星级样式照用：badge b-free(免费) b-fee(收费)
-     b-hot(必停) b-tip(提示)；景区级别 b-5a / b-4a / b-3a + b-show(非遗表演)；
-     美食权威度徽章 b-michelin / b-blackpearl / b-bibang / b-feiyi /
-     b-laozihao / b-kol / b-local；费用表用 class="fee"（橙色主题+隐藏费用警示行）；
-     星级用 .stars 类 ★★★★☆
+  2. 章节顺序固定：封面→①景点深度榜→②行程方案→③美食地图→
+     ④住宿精选→⑤充电规划(仅纯电自驾保留)→⑥费用预算→⑦实用贴士
+  3. 封面必须署名「设计者 · 博爱」；景点按最值得玩排名并给建议游玩时长；
+     行程方案给 2-3 个可选（周末/3日/4-5日），推荐方案挂 ribbon 丝带
+  4. 非纯电出行：删除"充电规划"整章，并把后续章节号 -1
+  5. 纯 CSS + 内联 SVG 排版，禁止外网图片
+  6. 徽章体系：景区 b-5a/b-4a/b-3a/b-free(免费)/b-tip(闭馆)/b-show(非遗表演)；
+     美食 b-michelin/b-blackpearl/b-bibang/b-feiyi/b-laozihao/b-kol/b-local；
+     排名徽章 rank r1(金)/r2(银)/r3(铜)/rn(灰)；费用表 class="fee"(橙)+hiddenfee 警示行
   ============================================================
 -->
 <style>
   @page { size: A4; margin: 15mm 13mm; }
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   body { font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; color: #2b2b2b; margin: 0; font-size: 10.5pt; line-height: 1.65; }
-  .cover { height: 257mm; background: linear-gradient(160deg, #0b3d2e 0%, #11664b 45%, #1d8a63 100%); color: #fff; border-radius: 6mm; padding: 30mm 20mm; position: relative; page-break-after: always; overflow: hidden; }
+  /* ---------- 封面 ---------- */
+  .cover { height: 257mm; background: linear-gradient(160deg, #0b3d2e 0%, #11664b 45%, #1d8a63 100%); color: #fff; border-radius: 6mm; padding: 26mm 20mm 30mm; position: relative; page-break-after: always; overflow: hidden; }
   .cover::after { content: ""; position: absolute; right: -40mm; top: -40mm; width: 120mm; height: 120mm; border: 2mm solid rgba(255,255,255,.18); border-radius: 50%; }
   .cover::before { content: ""; position: absolute; right: 10mm; bottom: 20mm; width: 70mm; height: 70mm; border: 1.5mm solid rgba(255,255,255,.14); border-radius: 50%; }
-  .cover .kicker { letter-spacing: 4px; font-size: 11pt; color: #ffd9a8; margin-bottom: 8mm; }
-  .cover h1 { font-size: 42pt; margin: 0 0 4mm; letter-spacing: 2px; }
-  .cover .sub { font-size: 15pt; color: #ffe9c9; margin-bottom: 12mm; }
-  .cover .route { font-size: 12pt; color: #e8f5ee; background: rgba(255,255,255,.12); border-radius: 3mm; padding: 5mm 6mm; margin-bottom: 10mm; line-height: 1.9; }
-  .cover .facts { display: flex; flex-wrap: wrap; gap: 4mm; }
-  .cover .fact { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); border-radius: 2.5mm; padding: 3mm 5mm; font-size: 10pt; }
-  .cover .date { position: absolute; bottom: 22mm; left: 20mm; font-size: 10.5pt; color: #cfe8dd; }
+  .cover .kicker { letter-spacing: 4px; font-size: 11pt; color: #ffd9a8; margin-bottom: 6mm; }
+  .cover h1 { font-size: 46pt; margin: 0 0 2mm; letter-spacing: 2px; }
+  .cover .en { font-size: 11pt; letter-spacing: 8px; color: #9fd6bd; text-transform: uppercase; margin-bottom: 6mm; }
+  .cover .sub { font-size: 14.5pt; color: #ffe9c9; margin-bottom: 7mm; }
+  .cover .goldline { width: 30mm; height: 1.5mm; background: linear-gradient(90deg, #ffd9a8, #e8642a); border-radius: 1mm; margin-bottom: 7mm; }
+  .cover .route { font-size: 11.5pt; color: #e8f5ee; background: rgba(255,255,255,.12); border-radius: 3mm; padding: 4mm 5mm; margin-bottom: 7mm; line-height: 1.8; }
+  .cover .feats { display: flex; gap: 4mm; }
+  .cover .feat { flex: 1; text-align: center; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25); border-radius: 3mm; padding: 3.5mm 2mm; font-size: 9.5pt; }
+  .cover .feat .n { display: block; font-size: 19pt; font-weight: 700; color: #ffd9a8; line-height: 1.2; }
+  .cover .sign { position: absolute; top: 16mm; right: 18mm; text-align: right; z-index: 3; }
+  .cover .sign .by { font-size: 8pt; letter-spacing: 4px; color: #9fd6bd; text-transform: uppercase; }
+  .cover .sign .who { font-size: 14pt; color: #ffd9a8; font-weight: 700; margin-top: 1mm; }
+  .cover .date { position: absolute; bottom: 24mm; left: 20mm; font-size: 10.5pt; color: #cfe8dd; z-index: 2; }
+  .cover-art { position: absolute; bottom: 0; left: 0; width: 100%; height: 48mm; z-index: 2; }
+  /* 封面实景图背景层（可选）：最著名景点实景图，base64 内嵌，图片上方叠渐变遮罩保证文字可读 */
+  .cover .bgimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 6mm; z-index: 0; }
+  .cover .overlay { position: absolute; inset: 0; border-radius: 6mm; background: linear-gradient(200deg, rgba(7,40,30,.92) 0%, rgba(13,63,46,.72) 40%, rgba(23,90,65,.45) 100%); z-index: 1; }
+  .cover .kicker, .cover h1, .cover .en, .cover .sub, .cover .slogan, .cover .goldline, .cover .route, .cover .feats { position: relative; z-index: 2; }
+  .cover .slogan { font-size: 13pt; color: #ffe9c9; font-weight: 600; letter-spacing: 1px; margin-bottom: 5mm; }
+  .cover .slogan .q { color: #ffd9a8; }
+  /* ---------- 章节头 ---------- */
   h2.ch { font-size: 17pt; color: #0b3d2e; border-left: 4mm solid #e8642a; background: linear-gradient(90deg, #fdf3ec, rgba(253,243,236,0)); border-radius: 2mm; padding: 2.5mm 4mm; margin: 10mm 0 5mm; }
   h2.ch .no { display: inline-block; background: linear-gradient(135deg, #e8642a, #f09a3e); color: #fff; font-size: 11pt; border-radius: 1.5mm; padding: 0.5mm 2.5mm; margin-right: 3mm; vertical-align: 2px; }
-  h3 { font-size: 12.5pt; color: #0f6e4f; margin: 7mm 0 2.5mm; }
+  .ch-sub { display: block; font-size: 8pt; letter-spacing: 4px; color: #b08a5a; margin-top: 1.2mm; font-weight: 400; }
+  h3 { font-size: 12.5pt; color: #0f6e4f; margin: 7mm 0 2.5mm; padding-bottom: 1mm; border-bottom: 0.5mm solid #e8e2d5; }
   p { margin: 1.5mm 0; }
   .chapintro { font-size: 9.5pt; color: #777; margin: -1mm 0 3mm; }
+  /* ---------- 表格 ---------- */
   table { width: 100%; border-collapse: collapse; margin: 3mm 0; font-size: 9.8pt; }
   th { background: linear-gradient(90deg, #0f6e4f, #1d8a63); color: #fff; padding: 2.2mm 2.5mm; text-align: left; font-weight: 600; }
   td { padding: 2.2mm 2.5mm; border-bottom: 1px solid #e3e0d8; vertical-align: top; }
   tr:nth-child(even) td { background: #f6f3ec; }
   .stars { color: #e8642a; letter-spacing: 1px; white-space: nowrap; }
+  /* ---------- 徽章 ---------- */
   .badge { display: inline-block; font-size: 8.5pt; border-radius: 1.5mm; padding: 0.3mm 2mm; margin-right: 1.5mm; }
   .b-free { background: #e3f4ec; color: #0f6e4f; }
   .b-fee { background: #fdeee4; color: #c0551c; }
   .b-hot { background: #fdeaea; color: #c0392b; }
   .b-tip { background: #eef2fb; color: #34528c; }
-  /* 景区 A 级评级徽章 + 非遗表演 */
   .b-5a { background: linear-gradient(135deg, #c9a227, #e0b84c); color: #fff; }
   .b-4a { background: #2f6fb3; color: #fff; }
   .b-3a { background: #3e8e5a; color: #fff; }
   .b-show { background: #7b1fa2; color: #fff; }
-  /* 美食权威度徽章 */
   .b-michelin { background: #bd1e2d; color: #fff; }
   .b-blackpearl { background: #1a1a1a; color: #e8c468; }
   .b-bibang { background: #ff7a00; color: #fff; }
@@ -66,24 +81,15 @@
   .b-kol { background: #00838f; color: #fff; }
   .b-local { background: #2e7d32; color: #fff; }
   .authrow { margin: 1.5mm 0; }
-  .food th { background: #eef2ee; color: #0b3d2e; }
-  .food td { font-size: 9.8pt; }
-  .daycard { border: 1px solid #dcd7cc; border-radius: 3mm; padding: 4mm 5mm; margin: 3mm 0; background: #fffdf9; page-break-inside: avoid; }
-  .daycard .daytitle { font-size: 12.5pt; font-weight: 700; color: #fff; background: linear-gradient(90deg, #0f6e4f, #1d8a63); border-radius: 2mm; padding: 1.8mm 4mm; display: inline-block; margin-bottom: 2.5mm; }
-  .daycard .d0 { background: linear-gradient(90deg, #4a4a5a, #6a6a7c); }
-  .tline { width: 100%; border-collapse: collapse; }
-  .tline td { border: none; padding: 1.2mm 2mm; font-size: 9.8pt; }
-  .tline tr:nth-child(even) td { background: transparent; }
-  .tline .t { color: #0f6e4f; font-weight: 700; white-space: nowrap; width: 27mm; }
-  .card { border: 1px solid #dcd7cc; border-radius: 3mm; padding: 3.5mm 4.5mm; margin: 3mm 0; page-break-inside: avoid; background: #fffdf9; box-shadow: 0 0.8mm 2mm rgba(60,40,10,.07); }
-  /* 费用表：橙色主题 + 隐藏费用红色警示行 */
-  .fee th { background: linear-gradient(90deg, #c0551c, #e8642a); }
-  table.fee tr.hiddenfee td { background: #fdeeee; color: #b03a2e; font-weight: 600; }
-  /* 封面装饰 */
-  .cover .goldline { width: 30mm; height: 1.5mm; background: linear-gradient(90deg, #ffd9a8, #e8642a); border-radius: 1mm; margin-bottom: 6mm; }
-  .cover-art { position: absolute; bottom: 0; left: 0; width: 100%; height: 45mm; }
-  .cover .date { z-index: 2; }
+  /* 排名徽章 */
+  .rank { display: inline-block; width: 7mm; height: 7mm; line-height: 7mm; text-align: center; border-radius: 50%; background: #eef2ee; color: #0b3d2e; font-weight: 700; font-size: 9.5pt; }
+  .rank.r1 { background: linear-gradient(135deg, #c9a227, #e0b84c); color: #fff; }
+  .rank.r2 { background: linear-gradient(135deg, #9aa5b1, #c3cdd6); color: #fff; }
+  .rank.r3 { background: linear-gradient(135deg, #b07a4a, #d0a076); color: #fff; }
+  /* ---------- 卡片 ---------- */
+  .card { position: relative; border: 1px solid #dcd7cc; border-radius: 3mm; padding: 3.5mm 4.5mm; margin: 3mm 0; page-break-inside: avoid; background: #fffdf9; box-shadow: 0 0.8mm 2mm rgba(60,40,10,.07); }
   .card .name { font-size: 12pt; font-weight: 700; color: #0b3d2e; }
+  .ribbon { position: absolute; top: -1.2mm; right: 4mm; background: linear-gradient(135deg, #e8642a, #f09a3e); color: #fff; font-size: 8.5pt; padding: 1mm 4mm 1.5mm; border-radius: 0 0 2mm 2mm; box-shadow: 0 0.6mm 1.2mm rgba(200,85,28,.35); }
   .grid2 { display: flex; gap: 4mm; }
   .grid2 > div { flex: 1; }
   ul { margin: 2mm 0; padding-left: 6mm; }
@@ -98,97 +104,78 @@
   .kv tr:nth-child(even) td { background: #f6f3ec; }
   .kv .k { background: #eef2ee; font-weight: 700; width: 30mm; color: #0b3d2e; }
   .tag { display: inline-block; background: #0f6e4f; color: #fff; border-radius: 1.2mm; font-size: 8pt; padding: 0.3mm 1.8mm; margin-left: 1.5mm; vertical-align: 2px; }
+  .food th { background: #eef2ee; color: #0b3d2e; }
+  .food td { font-size: 9.8pt; }
+  .fee th { background: linear-gradient(90deg, #c0551c, #e8642a); }
+  table.fee tr.hiddenfee td { background: #fdeeee; color: #b03a2e; font-weight: 600; }
+  /* 行程方案矩阵表 */
+  .plan th { background: linear-gradient(90deg, #0f6e4f, #1d8a63); }
+  .plan td.d { font-weight: 700; color: #0f6e4f; white-space: nowrap; width: 16mm; }
 </style>
 </head>
 <body>
 
 <!-- ==================== 封面 ==================== -->
 <div class="cover">
-  <!-- 【填】kicker：如"广州出发 · 电车自驾 · 周末游" -->
+  <!-- 【填】封面实景图：最著名景点实景图 base64 内嵌（Wikimedia Commons/Unsplash 下载后
+       python3 -c "import base64;print(base64.b64encode(open('x.jpg','rb').read()).decode())"
+       填入 src；拿不到图就删掉 img 和 overlay 两行，改回 SVG 剪影模式 -->
+  <img class="bgimg" src="data:image/jpeg;base64,【填】图片BASE64" alt="">
+  <div class="overlay"></div>
+  <!-- 署名：必须保留 -->
+  <div class="sign">
+    <div class="by">Designed by</div>
+    <div class="who">设计者 · 博爱</div>
+  </div>
+  <!-- 【填】kicker：如"广州出发 · 纯电自驾 · 随心选行程" -->
   <div class="kicker">【填】出发地 · 出行方式 · 行程性质</div>
-  <!-- 【填】城市名 -->
+  <!-- 【填】城市名 + 英文/拼音 -->
   <h1>【目的地】</h1>
-  <!-- 【填】副标题：如"嗦粉之城 · 山水龙城 ｜ 2日2晚攻略" -->
-  <div class="sub">【填】目的地主题词 ｜ N日M晚攻略</div>
-  <!-- 金色分隔线（装饰，保留） -->
+  <div class="en">【填】ZHAOQING · TRAVEL GUIDE</div>
+  <!-- 【填】副标题：目的地主题词，不写天数 -->
+  <div class="sub">【填】山水端州 · 岭南秘境 ｜ 深度游全攻略</div>
+  <!-- 【填】当地官方旅游宣传语（检索「城市名 旅游宣传口号」），如「中国砚都 · 七星肇庆」 -->
+  <div class="slogan">「<span class="q">【填】官方宣传语</span>」<span style="color:#cfe8dd;font-size:10pt">　【填】配套 tagline（如"那么美，这么近，周末到XX"）</span></div>
   <div class="goldline"></div>
-  <!-- 【填】路线行：交通路线 + 里程/时长/时间安排 -->
+  <!-- 【填】一行说明：出发方式/距离/特点 -->
   <div class="route">
-    🚗 【填】路线：出发地 —高速名→ 中转点 —→ 目的地<br>
-    单程约 XXX km ｜ 驾驶约 X.X h + 充电 XX min ｜ 出发日出发 · 返程日到家
+    🚗 【填】出发地 —高速名→ 目的地 ｜ 单程约 XX km · X.X 小时 ｜ 周末/3日/4-5日多条路线任选
   </div>
-  <!-- 【填】4 个亮点徽章：如 电车友好 / 景点免费 / 招牌美食 / 人均预算 -->
-  <div class="facts">
-    <div class="fact">🔌 【填】亮点 1</div>
-    <div class="fact">🆓 【填】亮点 2</div>
-    <div class="fact">🍜 【填】亮点 3</div>
-    <div class="fact">💴 【填】亮点 4</div>
+  <!-- 【填】3 个数字特征条 -->
+  <div class="feats">
+    <div class="feat"><span class="n">2</span>个 5A 景区</div>
+    <div class="feat"><span class="n">8</span>道必吃美食</div>
+    <div class="feat"><span class="n">3</span>条行程方案</div>
   </div>
-  <!-- 山峦剪影 + 落日装饰（内联 SVG，纯本地渲染，保留勿删） -->
+  <!-- 无实景图时才保留此 SVG 剪影；有实景图则删除 -->
   <svg class="cover-art" viewBox="0 0 800 160" preserveAspectRatio="none" aria-hidden="true">
     <polygon points="0,160 60,58 120,112 175,38 235,118 300,68 352,160" fill="rgba(255,255,255,.10)"/>
     <polygon points="300,160 385,80 445,128 505,52 575,124 645,88 700,160" fill="rgba(255,255,255,.16)"/>
     <circle cx="665" cy="48" r="24" fill="#ffd9a8"/>
   </svg>
-  <!-- 【填】具体日期（含星期） -->
-  <div class="date">【填】XXXX.X.XX（周五）晚出发 — X.XX（周日）晚返回</div>
+  <!-- 【填】更新日期，不写固定行程天数 -->
+  <div class="date">【填】2026 年 8 月更新 · 价格以官方当日公布为准</div>
 </div>
 
-<!-- ==================== 第一章 行程总览 ==================== -->
-<h2 class="ch"><span class="no">1</span>行程总览</h2>
-
-<!-- 【填】每个 Day 一个 daycard；首日赶路用 d0 深色标题，游玩日用默认绿色标题 -->
-<div class="daycard">
-  <div class="daytitle d0">Day 0 · 【填】出发日星期 X｜出发地 → 目的地（约 XXX km）</div>
-  <table class="tline">
-    <tr><td class="t">【时间】</td><td>【填】安排（🚩 充电点、⚠️ 时间节点按阶段 3 规范标记）</td></tr>
-  </table>
-  <div class="rule">💡 【填】本日备选方案（如"满桩就下高速去市区充"）</div>
-</div>
-
-<div class="daycard">
-  <div class="daytitle">Day 1 · 【填】星期 X｜主题</div>
-  <table class="tline">
-    <tr><td class="t">【时间】</td><td>【填】安排</td></tr>
-  </table>
-</div>
-
-<div class="daycard">
-  <div class="daytitle">Day 2 · 【填】星期 X｜主题 + 返程</div>
-  <table class="tline">
-    <tr><td class="t">【时间】</td><td>【填】安排（返程日倒推出发时间）</td></tr>
-  </table>
-  <div class="warn">⚠️ 【填】风险提醒（如"续航低于 XXX 需两充"）</div>
-</div>
-
-<h3>交通速查</h3>
-<table class="kv">
-  <tr><td class="k">路线/班次</td><td>【填】自驾高速路线，或高铁车次/航班时刻，以实时导航/官方为准</td></tr>
-  <tr><td class="k">时长</td><td>【填】单程时长（自驾含充电/休息；高铁含提前到站；飞机含值机安检）</td></tr>
-  <tr><td class="k">路费/票价</td><td>【填】高速费或车票/机票价格</td></tr>
-  <tr><td class="k">补能成本</td><td>【填】按交通方式：电费（纯电）/ 油费（油车/混动）/ 无（高铁飞机）</td></tr>
-  <tr><td class="k">备选方案</td><td>【填】中途过夜、改签班次等 Plan B</td></tr>
-</table>
-
-<!-- ==================== 第二章 景点深度榜 ====================
-     三层结构：① 总览表（含 A 级徽章）→ ② 必去景点逐卡详解 → ③ 驴友小众推荐
-     A 级徽章：b-5a / b-4a / b-3a；免票用 b-free；闭馆日用 b-tip；非遗表演用 b-show（带场次时间）
-     费用透明三件套：挂牌价+优惠人群 / 套票拆解（标省亏）/ 隐藏费用红色警示行
+<!-- ==================== 第一章 景点深度榜 ====================
+     按「最值得玩」综合排名；总览表含建议游玩时长；详解卡给
+     文化简介四要素 + 必玩/打卡 + 路线与费用透明三件套；
+     文末附驴友小众推荐
      ==================== -->
-<h2 class="ch pagebreak"><span class="no">2</span>景点深度榜</h2>
-<p class="chapintro">【填】本章导读：总览看全貌，详解卡给「文化故事 + 必玩清单 + 路线费用」，文末附驴友小众推荐。</p>
+<h2 class="ch pagebreak"><span class="no">1</span>景点深度榜<span class="ch-sub">TOP ATTRACTIONS RANKED</span></h2>
+<p class="chapintro">【填】按「最值得玩」综合排名——考虑稀缺性、口碑与体验深度；「建议时长」帮你按自己的时间自由挑选组合，行程方案见下一章。</p>
 
 <h3>📋 景点总览</h3>
 <table class="attr">
-  <tr><th style="width:7mm">排名</th><th>景点</th><th>景区级别</th><th>门票</th><th>推荐</th><th>一句话亮点</th></tr>
-  <!-- 【填】每个景点一行：级别用 b-5a/b-4a/b-3a/b-free；闭馆日加 b-tip；星级 .stars -->
-  <tr><td>1</td><td><b>【景点名】</b></td><td><span class="badge b-5a">5A</span></td><td><span class="badge b-fee">70 元</span></td><td class="stars">★★★★★</td><td>【一句话亮点】</td></tr>
+  <tr><th style="width:12mm">排名</th><th>景点</th><th>景区级别</th><th>门票</th><th>建议时长</th><th>推荐</th><th>一句话亮点</th></tr>
+  <!-- 【填】排名徽章：前 3 名用 rank r1/r2/r3，其余 rank rn；级别 b-5a/b-4a/b-3a/b-free；闭馆日加 b-tip -->
+  <tr><td><span class="rank r1">1</span></td><td><b>【景点名】</b></td><td><span class="badge b-5a">5A</span></td><td><span class="badge b-fee">70 元</span></td><td>4 小时</td><td class="stars">★★★★★</td><td>【一句话亮点】</td></tr>
 </table>
 
 <h3>🎯 必去景点详解</h3>
-<!-- 【填】每个必去景点复制一张详解卡；头牌景点全四块，次要景点可精简；文化内容无真实出处的整行删除 -->
+<!-- 【填】每个必去景点复制一张详解卡；头牌全四块，次要可精简；文化内容无真实出处整行删除 -->
 <div class="card">
-  <div class="name">【景点名】<span class="tag">【建议时段】</span></div>
+  <div class="name">【景点名】<span class="tag">建议 X 小时</span></div>
   <div class="authrow">
     <span class="badge b-5a">5A 景区</span>
     <span class="badge b-feiyi">非遗景区</span>
@@ -200,7 +187,7 @@
     <tr><td class="k">📜 故事传说</td><td>【填】经典故事/神话</td></tr>
     <tr><td class="k">👤 历史人物</td><td>【填】相关人物与事迹</td></tr>
     <tr><td class="k">🏗 建筑看点</td><td>【填】风格/结构/年代</td></tr>
-    <tr><td class="k">🧧 非遗</td><td>【填】非遗景区/技艺；表演带场次时间（如"每日 10:00/15:00"）</td></tr>
+    <tr><td class="k">🧧 非遗</td><td>【填】非遗景区/技艺；表演带场次时间</td></tr>
   </table>
   <!-- ② 游玩清单 -->
   <ul>
@@ -212,33 +199,85 @@
   <table class="fee">
     <tr><th style="width:30mm">费用项</th><th>说明</th></tr>
     <tr><td>🎫 门票</td><td>【填】挂牌 XX 元｜半价/免费人群｜闭馆日</td></tr>
-    <tr><td>🎟 套票</td><td>【填】套票 XX 元 = 门票 + 小景点 A/B（单买合计 XX 元 → 省/亏 X 元）；不值的小景点直言可跳过</td></tr>
-    <tr><td>🚌 园内交通</td><td>【填】摆渡车 XX / 索道 XX / 电梯 XX / 游船 XX</td></tr>
-    <tr class="hiddenfee"><td>⚠️ 隐藏费用</td><td>【填】停车 XX、讲解 XX、照相点 XX——提前知道免尴尬</td></tr>
-    <tr><td>🚶 路线</td><td>【填】动线：XX 门进 → A → B → XX 门出，全程约 X 小时</td></tr>
+    <tr><td>🎟 套票</td><td>【填】套票拆解（标省/亏）；小景点另收费逐项列明，不值直言可跳过</td></tr>
+    <tr><td>🚌 园内交通</td><td>【填】摆渡车/索道/电梯/游船</td></tr>
+    <tr class="hiddenfee"><td>⚠️ 隐藏费用</td><td>【填】停车/讲解/照相点——提前知道免尴尬</td></tr>
+    <tr><td>🚶 路线</td><td>【填】动线：X 门进 → A → B → 出，全程约 X 小时</td></tr>
   </table>
 </div>
 
-<div class="warn">⏭️ <b>主动放弃项：</b>【填】太远/时间不够的景点列出并说明理由</div>
+<div class="warn">⏭️ <b>主动放弃项：</b>【填】太远/时间不够的景点列出并说明理由（与行程方案呼应）</div>
 
 <h3>🗺 驴友小众推荐</h3>
 <div class="card">
   <div class="name">【小众景点名】<span class="tag">距市区 X km · 车程 X h</span></div>
   <ul>
     <li><b>为什么去：</b>【填】人少出片/徒步/航拍等场景与驴友口碑</li>
-    <li><b>路线：</b>【填】导航关键词 + 路况提醒（最后一段非铺装等）</li>
-    <li><b>费用：</b>【填】门票/停车/隐藏费用（无门票直说免费）</li>
+    <li><b>路线：</b>【填】导航关键词 + 路况提醒</li>
+    <li><b>费用：</b>【填】门票/停车/隐藏费用（免费直说）</li>
   </ul>
 </div>
 
-<!-- ==================== 第三章 美食地图 ==================== -->
-<h2 class="ch"><span class="no">3</span>美食地图</h2>
-<!-- 【填】按用户饮食偏好标注：辣度分级写进每个推荐；忌口用户给替代选择（不辣菜式/不辣老店），不能只推招牌辣菜
-     【填】每家店一行，按权重排序（米其林/黑珍珠 > 必吃榜 > 非遗/老字号 > 本地口碑 > 博主推荐）；
-     权重标签有什么挂什么，不硬凑（小城市没有米其林）；非遗挂在菜品/技艺上不挂店 -->
+<!-- ==================== 第二章 行程方案 ====================
+     给 2-3 个可选方案：周末 2日1晚 / 3日2晚 / 4-5日深度；
+     与用户天数匹配的方案挂 ribbon「推荐」；
+     每个方案用 天 × 上午/下午/晚上 紧凑矩阵表
+     ==================== -->
+<h2 class="ch pagebreak"><span class="no">2</span>行程方案<span class="ch-sub">ITINERARY OPTIONS</span></h2>
+<p class="chapintro">【填】按自己的时间选一条走：景点可自由替换组合，编号对应第一章排名。</p>
+
+<h3>🗓 方案一 · 周末 2日1晚（首次到访首选）</h3>
 <div class="card">
-  <div class="name">【填】头牌美食<span class="tag">人均 XX 元</span></div>
-  <!-- 【填】权威背书行：b-michelin 米其林 / b-blackpearl 黑珍珠 / b-bibang 必吃榜 / b-feiyi 非遗 / b-laozihao 老字号 / b-kol 博主推荐 / b-local 本地人最爱 -->
+  <div class="ribbon">推荐</div>
+  <ul><li><b>适合：</b>【填】时间紧/首次到访，覆盖排名前两位的核心景区</li></ul>
+  <table class="plan">
+    <tr><th>天</th><th>上午</th><th>下午</th><th>晚上</th></tr>
+    <tr><td class="d">Day 1</td><td>【填】头牌景点</td><td>【填】次重点 + 🚩充电</td><td>【填】夜景/美食</td></tr>
+    <tr><td class="d">Day 2</td><td>【填】第二景区</td><td>【填】补电 + 伴手礼 + 返程</td><td>—</td></tr>
+  </table>
+</div>
+
+<h3>🗓 方案二 · 3日2晚（加小众与玩水）</h3>
+<div class="card">
+  <ul><li><b>适合：</b>【填】想加小众景点/玩水/慢节奏</li></ul>
+  <table class="plan">
+    <tr><th>天</th><th>上午</th><th>下午</th><th>晚上</th></tr>
+    <tr><td class="d">Day 1</td><td>【填】</td><td>【填】</td><td>【填】</td></tr>
+    <tr><td class="d">Day 2</td><td>【填】</td><td>【填】</td><td>【填】</td></tr>
+    <tr><td class="d">Day 3</td><td>【填】</td><td>【填】返程</td><td>—</td></tr>
+  </table>
+</div>
+
+<h3>🗓 方案三 · 4-5日深度线（全境精华）</h3>
+<div class="card">
+  <ul><li><b>适合：</b>【填】全境深度、周边县市连玩；4 日与 5 日的区别写清</li></ul>
+  <table class="plan">
+    <tr><th>天</th><th>上午</th><th>下午</th><th>晚上</th></tr>
+    <tr><td class="d">Day 1</td><td>【填】</td><td>【填】</td><td>【填】</td></tr>
+    <tr><td class="d">Day 2</td><td>【填】</td><td>【填】</td><td>【填】</td></tr>
+    <tr><td class="d">Day 3</td><td>【填】</td><td>【填】</td><td>【填】</td></tr>
+    <tr><td class="d">Day 4</td><td>【填】</td><td>【填】返程</td><td>—</td></tr>
+    <tr><td class="d">Day 5</td><td>【填】仅 5 日线：加封开/邻县等</td><td>【填】</td><td>—</td></tr>
+  </table>
+</div>
+
+<h3>交通速查</h3>
+<table class="kv">
+  <tr><td class="k">路线/班次</td><td>【填】自驾高速路线，或高铁车次/航班，以实时导航/官方为准</td></tr>
+  <tr><td class="k">时长</td><td>【填】单程时长（自驾含充电/休息；高铁含提前到站；飞机含值机安检）</td></tr>
+  <tr><td class="k">路费/票价</td><td>【填】高速费或车票/机票价格</td></tr>
+  <tr><td class="k">补能成本</td><td>【填】按交通方式：电费（纯电）/ 油费（油车/混动）/ 无（高铁飞机）</td></tr>
+  <tr><td class="k">备选方案</td><td>【填】中途过夜、改签班次等 Plan B</td></tr>
+</table>
+
+<!-- ==================== 第三章 美食地图 ====================
+     每条推荐带权威度标签与 店名/地址/招牌菜价格/贴士；
+     按饮食偏好标注辣度，忌口给替代选择
+     ==================== -->
+<h2 class="ch pagebreak"><span class="no">3</span>美食地图<span class="ch-sub">FOOD GUIDE</span></h2>
+
+<div class="card">
+  <div class="name">① 【填】头牌美食<span class="tag">人均 XX 元</span></div>
   <div class="authrow">
     <span class="badge b-bibang">必吃榜</span>
     <span class="badge b-feiyi">非遗</span>
@@ -249,16 +288,15 @@
     <tr>
       <td><b>【店名】</b><br>【地址：商圈/街道 + 导航关键词】</td>
       <td>【招牌菜 12 元】<br>【必点 2】</td>
-      <td>【权重标签 + 排队贴士：如 11 点前去】</td>
+      <td>【标签 + 排队贴士：11 点前去】</td>
     </tr>
   </table>
-  <ul>
-    <li><b>吃法要点：</b>【填】辣度/必加配料/搭配解腻</li>
-  </ul>
+  <ul><li><b>吃法要点：</b>【填】辣度/必加配料/搭配解腻</li></ul>
 </div>
+
 <div class="card">
-  <div class="name">【填】大菜/正餐<span class="tag">晚餐/夜宵</span></div>
-  <div class="authrow"><span class="badge b-bibang">必吃榜</span></div>
+  <div class="name">② 【填】大菜/正餐<span class="tag">晚餐 · 人均 XX 元</span></div>
+  <div class="authrow"><span class="badge b-laozihao">【填】国家地理标志等</span></div>
   <table class="food">
     <tr><th>店名 · 地址</th><th>招牌菜（价格）</th><th>权重 / 贴士</th></tr>
     <tr>
@@ -268,80 +306,80 @@
     </tr>
   </table>
 </div>
+
 <div class="grid2">
   <div class="card">
-    <div class="name">【填】市场/早市</div>
+    <div class="name">③ 【填】市场/早市</div>
     <ul><li>【填】摊位与单品价格（含地址区域）</li></ul>
   </div>
   <div class="card">
-    <div class="name">【填】夜市/小吃街</div>
+    <div class="name">④ 【填】夜市/小吃街</div>
     <ul><li>【填】单品与招牌（含地址区域）</li></ul>
   </div>
 </div>
+
 <div class="card">
   <div class="name">🎁 伴手礼清单</div>
   <ul><li>【填】可带走的特产（品牌 + 参考价）</li></ul>
 </div>
 
 <!-- ==================== 第四章 住宿精选 ==================== -->
-<h2 class="ch pagebreak"><span class="no">4</span>住宿精选（【填】晚数：周五 + 周六）</h2>
+<h2 class="ch pagebreak"><span class="no">4</span>住宿精选<span class="ch-sub">WHERE TO STAY</span></h2>
 <table>
   <tr><th>档位</th><th>区域 / 参考</th><th>价格</th><th>适合</th></tr>
-  <!-- 【填】按用户确认的 档次（经济/标准/豪华）× 类型（连锁/民宿/高档酒店）分档，
-       用户选的档放第一行并标「推荐」；默认标准型+按行程位置推荐 -->
-  <tr><td>标准档（推荐）</td><td>【填】商圈/连锁名或民宿名</td><td>【填】价格</td><td>【填】理由</td></tr>
+  <!-- 【填】按用户确认的 档次×类型 分档，用户选的档放第一行标「推荐」 -->
+  <tr><td><b>经济档（推荐）</b></td><td>【填】店名 + 地址</td><td>【填】价格</td><td>【填】理由</td></tr>
 </table>
-<div class="rule">🔌 <b>【填】选房第一原则：</b>（纯电场景：优先带充电桩酒店；油车：优先免费停车；高铁/飞机：优先近车站/机场或行程中心）</div>
+<div class="rule">🔌 <b>选房第一原则：</b>【填】纯电：优先带充电桩酒店；油车：优先免费停车；高铁/飞机：优先近车站或行程中心</div>
 
 <!-- ==================== 第五章 充电规划（章节处理规则见下） ====================
   · 自驾纯电 → 保留整章，填沿途与市区各充电点
-  · 自驾混动 → 删除整章，把「补能要点」（加油为主+插混可充电省钱）并进实用贴士
+  · 自驾混动 → 删除整章，把「补能要点」并进实用贴士
   · 油车 / 高铁 / 飞机 → 删除整章，并把后续章节号 -1
   ==================== -->
-<h2 class="ch"><span class="no">5</span>充电规划（纯电自驾）</h2>
+<h2 class="ch"><span class="no">5</span>充电规划<span class="ch-sub">EV CHARGING</span></h2>
 <table>
   <tr><th>站点</th><th>位置</th><th>桩况 / 实测</th><th>建议</th></tr>
-  <!-- 【填】沿途与市区各充电点：去程必停/备选/返程首选/市区超充/酒店慢充 -->
-  <tr><td><b>【服务区/站点名】</b></td><td>【高速名】</td><td>【桩数/实测功率】</td><td><span class="badge b-hot">去程必停</span>【说明】</td></tr>
+  <!-- 【填】沿途与市区各充电点 -->
+  <tr><td><b>【站点名】</b></td><td>【地址】</td><td>【桩数/功率/实测】</td><td><span class="badge b-hot">市区首选</span>【说明】</td></tr>
 </table>
-<h3>电车铁律</h3>
+<div class="warn">⚠️ 【填】本行程的充电注意点（如某景区无桩、长途需两充）</div>
+<h3>纯电铁律</h3>
 <ul>
   <li><b>30% 就找桩</b>，不等报警；高速续航按 CLTC <b>7 折</b>规划，预留 20% 冗余</li>
   <li><b>充到 80-90% 就拔枪</b>，末段充电慢；30-40 分钟正好吃饭休息</li>
   <li>出发前：高德「新能源模式」看沿途桩位/电价/空闲；APP 备好 <b>特来电 + 星星充电 + 国家电网 e充电 + 小桔</b>，提前完成实名和免密支付</li>
-  <li>错峰：<b>10:00-15:00 最挤</b>；清晨、午后 14-16 点、22 点后空闲；饭点前后半小时最尴尬</li>
-  <li>服务区排队超 30 分钟 → <b>下高速去市区/县城充</b>（出口 3-5 km 内商场桩），耗时反而更短</li>
+  <li>错峰：<b>10:00-15:00 最挤</b>；清晨、午后 14-16 点、22 点后空闲</li>
+  <li>服务区排队超 30 分钟 → <b>下高速去市区/县城充</b>（出口 3-5 km 内商场桩）</li>
   <li>【填】季节专项提醒（夏天找阴凉/冬天电池预热）</li>
 </ul>
 
-<!-- ==================== 第六章 费用预算 ==================== -->
-<h2 class="ch pagebreak"><span class="no">6</span>费用预算</h2>
+<!-- ==================== 第六章 费用预算（按方案分列） ==================== -->
+<h2 class="ch pagebreak"><span class="no">6</span>费用预算<span class="ch-sub">BUDGET</span></h2>
 <table>
-  <tr><th>项目</th><th>明细</th><th>金额</th></tr>
-  <tr><td>电费/车费</td><td>【填】</td><td>【填】约 XX 元</td></tr>
-  <tr><td>高速费</td><td>【填】</td><td>【填】约 XX 元</td></tr>
-  <tr><td>住宿</td><td>【填】</td><td>【填】经济 XX / 舒适 XX 元起</td></tr>
-  <tr><td>餐饮</td><td>【填】</td><td>人均约 XX 元</td></tr>
-  <tr><td>门票/市内</td><td>【填】</td><td>约 XX 元</td></tr>
+  <tr><th>行程方案</th><th>人均经济版</th><th>人均舒适版</th><th>说明</th></tr>
+  <tr><td><b>周末 2日1晚</b></td><td>约 XXX 元</td><td>约 XXX 元</td><td>【填】取舍项</td></tr>
+  <tr><td><b>3日2晚</b></td><td>约 XXX 元</td><td>约 XXX 元</td><td>【填】</td></tr>
+  <tr><td><b>4-5日深度</b></td><td>约 XXX 元</td><td>约 XXX 元</td><td>【填】4日与5日差额</td></tr>
 </table>
 <div class="card">
-  <div class="name">人均预算（【填】人数）</div>
+  <div class="name">费用明细参考（以周末线为例，【填】人数）</div>
   <ul>
-    <li><b>经济版 ≈ XXX 元/人</b>：【填】取舍</li>
-    <li><b>舒适版 ≈ XXX 元/人</b>：【填】取舍</li>
+    <li>【填】电费/油费、高速费、住宿、门票、园内交通、餐饮、停车逐项列出</li>
+    <li>【填】优惠提示：学生/老人免票半价、大学生免费政策等</li>
     <li>【填】对比项（如电车 vs 油车成本）</li>
   </ul>
 </div>
 
 <!-- ==================== 第七章 实用贴士 ==================== -->
-<h2 class="ch"><span class="no">7</span>实用贴士</h2>
+<h2 class="ch"><span class="no">7</span>实用贴士<span class="ch-sub">TRAVEL TIPS</span></h2>
 <ul>
-  <li><b>天气：</b>【填】当期天气与应对（防晒/衣物/补水）</li>
-  <li><b>【填】主题避坑：</b>【填】辣度/砍价/黄牛等本地化提醒</li>
-  <li><b>时间节点：</b>【填】⚠️ 全部关键时间节点在这里再列一遍（停运/末班/闭馆/亮灯/场次）</li>
-  <li><b>市内交通：</b>【填】打车/共享/公交建议，自驾场景提醒"车停酒店、市内别开车"</li>
-  <li><b>充电错峰：</b>【填】结合行程的错峰安排（电车场景）</li>
-  <li><b>出发前：</b>【填】胎压/满电/ETC/证件/随车药品清单</li>
+  <li><b>天气：</b>【填】当期天气与应对</li>
+  <li><b>时间节点：</b>【填】⚠️ 全部关键时间节点汇总（停运/末班/闭馆/亮灯/场次）</li>
+  <li><b>防坑提醒：</b>【填】消费陷阱/拉客/套票话术等本地化提醒</li>
+  <li><b>充电错峰：</b>【填】结合行程的充电安排（纯电场景）</li>
+  <li><b>出发前：</b>【填】满电/胎压/ETC/证件/装备清单</li>
+  <li><b>市内交通：</b>【填】打车/共享/步行串联建议</li>
 </ul>
 
 <p class="sources" style="margin-top:8mm"><b>信息来源（【填】检索年月）：</b><br>
