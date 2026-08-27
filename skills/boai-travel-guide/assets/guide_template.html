@@ -17,7 +17,8 @@
      把补能要点并进实用贴士；油车/高铁/飞机删除，后续章节号 -1
   4. 纯 CSS 排版，不要引入外网图片（封面用渐变设计）
   5. 表格/徽章/星级样式照用：badge b-free(免费) b-fee(收费)
-     b-hot(必停) b-tip(提示)；星级用 .stars 类 ★★★★☆
+     b-hot(必停) b-tip(提示)；美食权威度徽章 b-michelin / b-blackpearl /
+     b-bibang / b-feiyi / b-laozihao / b-kol / b-local；星级用 .stars 类 ★★★★☆
   ============================================================
 -->
 <style>
@@ -48,6 +49,17 @@
   .b-fee { background: #fdeee4; color: #c0551c; }
   .b-hot { background: #fdeaea; color: #c0392b; }
   .b-tip { background: #eef2fb; color: #34528c; }
+  /* 美食权威度徽章 */
+  .b-michelin { background: #bd1e2d; color: #fff; }
+  .b-blackpearl { background: #1a1a1a; color: #e8c468; }
+  .b-bibang { background: #ff7a00; color: #fff; }
+  .b-feiyi { background: #8b4513; color: #fff; }
+  .b-laozihao { background: #a67c00; color: #fff; }
+  .b-kol { background: #00838f; color: #fff; }
+  .b-local { background: #2e7d32; color: #fff; }
+  .authrow { margin: 1.5mm 0; }
+  .food th { background: #eef2ee; color: #0b3d2e; }
+  .food td { font-size: 9.8pt; }
   .daycard { border: 1px solid #dcd7cc; border-radius: 3mm; padding: 4mm 5mm; margin: 3mm 0; background: #fffdf9; page-break-inside: avoid; }
   .daycard .daytitle { font-size: 12.5pt; font-weight: 700; color: #fff; background: linear-gradient(90deg, #0f6e4f, #1d8a63); border-radius: 2mm; padding: 1.8mm 4mm; display: inline-block; margin-bottom: 2.5mm; }
   .daycard .d0 { background: linear-gradient(90deg, #4a4a5a, #6a6a7c); }
@@ -158,32 +170,54 @@
 
 <!-- ==================== 第三章 美食地图 ==================== -->
 <h2 class="ch"><span class="no">3</span>美食地图</h2>
-<!-- 【填】按用户饮食偏好标注：辣度分级写进每个推荐；忌口用户给替代选择（不辣菜式/不辣老店），不能只推招牌辣菜 -->
+<!-- 【填】按用户饮食偏好标注：辣度分级写进每个推荐；忌口用户给替代选择（不辣菜式/不辣老店），不能只推招牌辣菜
+     【填】每家店一行，按权重排序（米其林/黑珍珠 > 必吃榜 > 非遗/老字号 > 本地口碑 > 博主推荐）；
+     权重标签有什么挂什么，不硬凑（小城市没有米其林）；非遗挂在菜品/技艺上不挂店 -->
 <div class="card">
   <div class="name">【填】头牌美食<span class="tag">人均 XX 元</span></div>
+  <!-- 【填】权威背书行：b-michelin 米其林 / b-blackpearl 黑珍珠 / b-bibang 必吃榜 / b-feiyi 非遗 / b-laozihao 老字号 / b-kol 博主推荐 / b-local 本地人最爱 -->
+  <div class="authrow">
+    <span class="badge b-bibang">必吃榜</span>
+    <span class="badge b-feiyi">非遗</span>
+    <span class="badge b-local">本地人最爱</span>
+  </div>
+  <table class="food">
+    <tr><th>店名 · 地址</th><th>招牌菜（价格）</th><th>权重 / 贴士</th></tr>
+    <tr>
+      <td><b>【店名】</b><br>【地址：商圈/街道 + 导航关键词】</td>
+      <td>【招牌菜 12 元】<br>【必点 2】</td>
+      <td>【权重标签 + 排队贴士：如 11 点前去】</td>
+    </tr>
+  </table>
   <ul>
-    <li><b>老店名单：</b>【填】本地人认可的老店名（标注辣度）</li>
     <li><b>吃法要点：</b>【填】辣度/必加配料/搭配解腻</li>
-    <li>【填】排队/售罄规律（如"11 点前去"）</li>
   </ul>
 </div>
 <div class="card">
   <div class="name">【填】大菜/正餐<span class="tag">晚餐/夜宵</span></div>
-  <ul><li>【填】店名 + 必点菜</li></ul>
+  <div class="authrow"><span class="badge b-bibang">必吃榜</span></div>
+  <table class="food">
+    <tr><th>店名 · 地址</th><th>招牌菜（价格）</th><th>权重 / 贴士</th></tr>
+    <tr>
+      <td><b>【店名】</b><br>【地址】</td>
+      <td>【必点菜 价格】</td>
+      <td>【标签 + 贴士】</td>
+    </tr>
+  </table>
 </div>
 <div class="grid2">
   <div class="card">
     <div class="name">【填】市场/早市</div>
-    <ul><li>【填】摊位与单品价格</li></ul>
+    <ul><li>【填】摊位与单品价格（含地址区域）</li></ul>
   </div>
   <div class="card">
     <div class="name">【填】夜市/小吃街</div>
-    <ul><li>【填】单品与招牌</li></ul>
+    <ul><li>【填】单品与招牌（含地址区域）</li></ul>
   </div>
 </div>
 <div class="card">
   <div class="name">🎁 伴手礼清单</div>
-  <ul><li>【填】可带走的特产</li></ul>
+  <ul><li>【填】可带走的特产（品牌 + 参考价）</li></ul>
 </div>
 
 <!-- ==================== 第四章 住宿精选 ==================== -->
