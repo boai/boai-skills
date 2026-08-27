@@ -38,16 +38,21 @@ fi
 # 独立 profile，避免与用户正在使用的浏览器实例冲突
 PROFILE="$(mktemp -d /tmp/html2pdf-profile.XXXXXX)"
 
+# 先渲染到临时文件再 mv 覆盖：Chrome 对已存在的目标路径可能静默写失败，
+# 而旧文件仍在会让 [ -s ] 误判成功——临时文件 + 原子替换保证产物一定是最新的
+TMP_OUT="$(mktemp /tmp/html2pdf-out.XXXXXX.pdf)"
+rm -f "$TMP_OUT"
+
 echo "🖨️  使用 $CHROME 渲染 PDF..."
 
 "$CHROME" --headless=new --disable-gpu --no-pdf-header-footer \
   --user-data-dir="$PROFILE" \
-  --print-to-pdf="$OUTPUT" "file://$INPUT" >/dev/null 2>&1 &
+  --print-to-pdf="$TMP_OUT" "file://$INPUT" >/dev/null 2>&1 &
 PID=$!
 
 # 最多等 90 秒，产物出现即认为成功
 for _ in $(seq 1 90); do
-  if [ -f "$OUTPUT" ] && [ -s "$OUTPUT" ]; then
+  if [ -f "$TMP_OUT" ] && [ -s "$TMP_OUT" ]; then
     break
   fi
   sleep 1
@@ -59,10 +64,13 @@ wait "$PID" 2>/dev/null || true
 pkill -f "$PROFILE" 2>/dev/null || true
 rm -rf "$PROFILE"
 
-if [ ! -s "$OUTPUT" ]; then
+if [ ! -s "$TMP_OUT" ]; then
   echo "❌ PDF 生成失败（无产物或文件为空）" >&2
   exit 1
 fi
+
+# 原子替换到目标路径（即使目标文件正被 Preview 打开也能替换成功）
+mv -f "$TMP_OUT" "$OUTPUT"
 
 echo "✅ PDF 已生成: $OUTPUT"
 ls -lh "$OUTPUT" | awk '{print "   大小: " $5}'
