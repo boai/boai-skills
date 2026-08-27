@@ -27,26 +27,27 @@
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   body { font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; color: #2b2b2b; margin: 0; font-size: 10.5pt; line-height: 1.65; }
   /* ---------- 封面 ---------- */
-  .cover { height: 257mm; background: linear-gradient(160deg, #0b3d2e 0%, #11664b 45%, #1d8a63 100%); color: #fff; border-radius: 6mm; padding: 30mm 20mm; position: relative; page-break-after: always; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-  .cover::after { content: ""; position: absolute; right: -40mm; top: -40mm; width: 120mm; height: 120mm; border: 2mm solid rgba(255,255,255,.18); border-radius: 50%; }
-  .cover::before { content: ""; position: absolute; right: 10mm; bottom: 20mm; width: 70mm; height: 70mm; border: 1.5mm solid rgba(255,255,255,.14); border-radius: 50%; }
-  .cover h1 { font-size: 52pt; margin: 0 0 3mm; letter-spacing: 6px; }
-  .cover .en { font-size: 10.5pt; letter-spacing: 10px; color: #9fd6bd; text-transform: uppercase; margin-bottom: 10mm; }
-  .cover .slogan { font-size: 15pt; color: #ffe9c9; font-weight: 600; letter-spacing: 1px; margin-bottom: 24mm; }
+  .cover { height: 257mm; background: #0b3d2e; color: #fff; border-radius: 6mm; position: relative; page-break-after: always; overflow: hidden; }
+  .cover::after { content: ""; position: absolute; right: -40mm; top: -40mm; width: 120mm; height: 120mm; border: 2mm solid rgba(255,255,255,.08); border-radius: 50%; }
+  .cover::before { content: ""; position: absolute; right: 10mm; bottom: 20mm; width: 70mm; height: 70mm; border: 1.5mm solid rgba(255,255,255,.06); border-radius: 50%; }
+  /* 照片区：上方 60%，官方代表构图实景图（如飞水潭瀑布/五龙亭经典画面），base64 内嵌 */
+  .cover .bgimg { position: absolute; top: 0; left: 0; width: 100%; height: 60%; object-fit: cover; object-position: 50% 55%; z-index: 0; }
+  /* 照片与信息带的渐变过渡 */
+  .cover .grad { position: absolute; top: 51%; left: 0; width: 100%; height: 11%; background: linear-gradient(180deg, rgba(11,61,46,0), #0b3d2e); z-index: 1; }
+  /* 信息带：下方 40% 实色深绿，文字永远清晰，版式居中 */
+  .cover .band { position: absolute; bottom: 0; left: 0; width: 100%; height: 40%; background: #0b3d2e; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 6mm 16mm 18mm; }
+  .cover h1 { font-size: 40pt; margin: 0 0 2mm; letter-spacing: 6px; }
+  .cover .en { font-size: 9.5pt; letter-spacing: 8px; color: #9fd6bd; text-transform: uppercase; margin-bottom: 6mm; }
+  .cover .slogan { font-size: 13pt; color: #ffe9c9; font-weight: 600; letter-spacing: 1px; margin-bottom: 9mm; }
   .cover .slogan .q { color: #ffd9a8; }
-  .cover .feats { display: flex; gap: 5mm; width: 82%; }
-  .cover .feat { flex: 1; text-align: center; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.25); border-radius: 3mm; padding: 3.5mm 2mm; font-size: 9.5pt; }
-  .cover .feat .n { display: block; font-size: 19pt; font-weight: 700; color: #ffd9a8; line-height: 1.2; }
-  /* 署名：右下角，小字低调 */
-  .cover .sign { position: absolute; bottom: 13mm; right: 15mm; text-align: right; z-index: 3; }
+  .cover .feats { display: flex; gap: 4mm; width: 80%; }
+  .cover .feat { flex: 1; text-align: center; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); border-radius: 2.5mm; padding: 3mm 2mm; font-size: 9pt; }
+  .cover .feat .n { display: block; font-size: 16pt; font-weight: 700; color: #ffd9a8; line-height: 1.25; }
+  /* 署名：右下角小字，与英文副题同色 */
+  .cover .sign { position: absolute; bottom: 6mm; right: 8mm; text-align: right; z-index: 3; }
   .cover .sign .by { font-size: 6.5pt; letter-spacing: 3px; color: #9fd6bd; text-transform: uppercase; }
   .cover .sign .who { font-size: 9.5pt; color: #9fd6bd; font-weight: 600; margin-top: 0.5mm; }
-  .cover .date { position: absolute; bottom: 13mm; left: 15mm; font-size: 8.5pt; color: rgba(207,232,221,.7); z-index: 2; }
-  .cover-art { position: absolute; bottom: 0; left: 0; width: 100%; height: 48mm; z-index: 2; }
-  /* 封面实景图背景层：官方代表构图（如文旅宣传片经典画面），base64 内嵌，叠渐变遮罩保证文字可读 */
-  .cover .bgimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; border-radius: 6mm; z-index: 0; }
-  .cover .overlay { position: absolute; inset: 0; border-radius: 6mm; background: linear-gradient(200deg, rgba(7,40,30,.92) 0%, rgba(13,63,46,.72) 40%, rgba(23,90,65,.45) 100%); z-index: 1; }
-  .cover h1, .cover .en, .cover .slogan, .cover .feats { position: relative; z-index: 2; }
+  .cover .date { position: absolute; bottom: 6.5mm; left: 8mm; font-size: 8pt; color: rgba(159,214,189,.8); z-index: 3; }
   /* ---------- 章节头 ---------- */
   h2.ch { font-size: 17pt; color: #0b3d2e; border-left: 4mm solid #e8642a; background: linear-gradient(90deg, #fdf3ec, rgba(253,243,236,0)); border-radius: 2mm; padding: 2.5mm 4mm; margin: 10mm 0 5mm; }
   h2.ch .no { display: inline-block; background: linear-gradient(135deg, #e8642a, #f09a3e); color: #fff; font-size: 11pt; border-radius: 1.5mm; padding: 0.5mm 2.5mm; margin-right: 3mm; vertical-align: 2px; }
@@ -114,36 +115,32 @@
 
 <!-- ==================== 封面 ==================== -->
 <div class="cover">
-  <!-- 【填】封面实景图：官方代表构图（文旅宣传片经典画面，如七星岩=五龙亭+七孔桥同框；
-       文旅局官方原图多为版权素材，可用 Wikimedia Commons 同构图 CC 实拍替代并注明来源）
+  <!-- 【填】封面实景图：官方代表构图（文旅宣传片经典画面：瀑布/亭桥/地标建筑均可；
+       文旅局官方原图多为版权素材，用 Wikimedia Commons 同构图 CC 实拍替代并注明来源）
        base64 内嵌：python3 -c "import base64;print(base64.b64encode(open('x.jpg','rb').read()).decode())"
-       拿不到图就删掉 img 和 overlay 两行，改回 SVG 剪影模式 -->
+       拿不到图就删掉 img 与 grad 两行（信息带为实色深绿，仍完整美观） -->
   <img class="bgimg" src="data:image/jpeg;base64,【填】图片BASE64" alt="">
-  <div class="overlay"></div>
-  <!-- 署名：右下角小字低调，必须保留 -->
-  <div class="sign">
-    <div class="by">Designed by</div>
-    <div class="who">设计者 · 博爱</div>
+  <div class="grad"></div>
+  <!-- 信息带：城市名 / 官方宣传语 / 三个数字条 / 日期与署名；出发地等细节放正文，不上封面 -->
+  <div class="band">
+    <h1>【目的地】</h1>
+    <div class="en">【填】ZHAOQING · TRAVEL GUIDE</div>
+    <!-- 【填】当地官方旅游宣传语（检索「城市名 旅游宣传口号」）+ 配套 tagline -->
+    <div class="slogan">「<span class="q">【填】官方宣传语</span>」<span style="color:#9fd6bd;font-size:10.5pt">　【填】tagline</span></div>
+    <!-- 【填】3 个数字特征条：重点景区数量 / 美食数量 / 行程方案数 -->
+    <div class="feats">
+      <div class="feat"><span class="n">2</span>个 5A 景区</div>
+      <div class="feat"><span class="n">8</span>道必吃美食</div>
+      <div class="feat"><span class="n">3</span>条行程方案</div>
+    </div>
+    <!-- 【填】更新日期，不写固定行程天数 -->
+    <div class="date">【填】2026 年 8 月更新 · 价格以官方当日公布为准</div>
+    <!-- 署名：右下角小字低调，必须保留 -->
+    <div class="sign">
+      <div class="by">Designed by</div>
+      <div class="who">设计者 · 博爱</div>
+    </div>
   </div>
-  <!-- 封面只保留四要素：城市名 / 官方宣传语 / 三个数字条 / 日期与署名（出发地等细节放正文） -->
-  <h1>【目的地】</h1>
-  <div class="en">【填】ZHAOQING · TRAVEL GUIDE</div>
-  <!-- 【填】当地官方旅游宣传语（检索「城市名 旅游宣传口号」）+ 配套 tagline -->
-  <div class="slogan">「<span class="q">【填】官方宣传语</span>」<span style="color:#cfe8dd;font-size:10.5pt">　【填】tagline</span></div>
-  <!-- 【填】3 个数字特征条：重点景区数量 / 美食数量 / 行程方案数 -->
-  <div class="feats">
-    <div class="feat"><span class="n">2</span>个 5A 景区</div>
-    <div class="feat"><span class="n">8</span>道必吃美食</div>
-    <div class="feat"><span class="n">3</span>条行程方案</div>
-  </div>
-  <!-- 无实景图时才保留此 SVG 剪影；有实景图则删除 -->
-  <svg class="cover-art" viewBox="0 0 800 160" preserveAspectRatio="none" aria-hidden="true">
-    <polygon points="0,160 60,58 120,112 175,38 235,118 300,68 352,160" fill="rgba(255,255,255,.10)"/>
-    <polygon points="300,160 385,80 445,128 505,52 575,124 645,88 700,160" fill="rgba(255,255,255,.16)"/>
-    <circle cx="665" cy="48" r="24" fill="#ffd9a8"/>
-  </svg>
-  <!-- 【填】更新日期，不写固定行程天数 -->
-  <div class="date">【填】2026 年 8 月更新 · 价格以官方当日公布为准</div>
 </div>
 
 <!-- ==================== 第一章 景点深度榜 ====================
