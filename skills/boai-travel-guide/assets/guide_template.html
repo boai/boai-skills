@@ -17,8 +17,10 @@
      把补能要点并进实用贴士；油车/高铁/飞机删除，后续章节号 -1
   4. 纯 CSS 排版，不要引入外网图片（封面用渐变设计）
   5. 表格/徽章/星级样式照用：badge b-free(免费) b-fee(收费)
-     b-hot(必停) b-tip(提示)；美食权威度徽章 b-michelin / b-blackpearl /
-     b-bibang / b-feiyi / b-laozihao / b-kol / b-local；星级用 .stars 类 ★★★★☆
+     b-hot(必停) b-tip(提示)；景区级别 b-5a / b-4a / b-3a + b-show(非遗表演)；
+     美食权威度徽章 b-michelin / b-blackpearl / b-bibang / b-feiyi /
+     b-laozihao / b-kol / b-local；费用表用 class="fee"（橙色主题+隐藏费用警示行）；
+     星级用 .stars 类 ★★★★☆
   ============================================================
 -->
 <style>
@@ -35,12 +37,13 @@
   .cover .facts { display: flex; flex-wrap: wrap; gap: 4mm; }
   .cover .fact { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); border-radius: 2.5mm; padding: 3mm 5mm; font-size: 10pt; }
   .cover .date { position: absolute; bottom: 22mm; left: 20mm; font-size: 10.5pt; color: #cfe8dd; }
-  h2.ch { font-size: 17pt; color: #0b3d2e; border-left: 4mm solid #e8642a; padding-left: 4mm; margin: 10mm 0 5mm; }
-  h2.ch .no { display: inline-block; background: #e8642a; color: #fff; font-size: 11pt; border-radius: 1.5mm; padding: 0.5mm 2.5mm; margin-right: 3mm; vertical-align: 2px; }
+  h2.ch { font-size: 17pt; color: #0b3d2e; border-left: 4mm solid #e8642a; background: linear-gradient(90deg, #fdf3ec, rgba(253,243,236,0)); border-radius: 2mm; padding: 2.5mm 4mm; margin: 10mm 0 5mm; }
+  h2.ch .no { display: inline-block; background: linear-gradient(135deg, #e8642a, #f09a3e); color: #fff; font-size: 11pt; border-radius: 1.5mm; padding: 0.5mm 2.5mm; margin-right: 3mm; vertical-align: 2px; }
   h3 { font-size: 12.5pt; color: #0f6e4f; margin: 7mm 0 2.5mm; }
   p { margin: 1.5mm 0; }
+  .chapintro { font-size: 9.5pt; color: #777; margin: -1mm 0 3mm; }
   table { width: 100%; border-collapse: collapse; margin: 3mm 0; font-size: 9.8pt; }
-  th { background: #0f6e4f; color: #fff; padding: 2.2mm 2.5mm; text-align: left; font-weight: 600; }
+  th { background: linear-gradient(90deg, #0f6e4f, #1d8a63); color: #fff; padding: 2.2mm 2.5mm; text-align: left; font-weight: 600; }
   td { padding: 2.2mm 2.5mm; border-bottom: 1px solid #e3e0d8; vertical-align: top; }
   tr:nth-child(even) td { background: #f6f3ec; }
   .stars { color: #e8642a; letter-spacing: 1px; white-space: nowrap; }
@@ -49,6 +52,11 @@
   .b-fee { background: #fdeee4; color: #c0551c; }
   .b-hot { background: #fdeaea; color: #c0392b; }
   .b-tip { background: #eef2fb; color: #34528c; }
+  /* 景区 A 级评级徽章 + 非遗表演 */
+  .b-5a { background: linear-gradient(135deg, #c9a227, #e0b84c); color: #fff; }
+  .b-4a { background: #2f6fb3; color: #fff; }
+  .b-3a { background: #3e8e5a; color: #fff; }
+  .b-show { background: #7b1fa2; color: #fff; }
   /* 美食权威度徽章 */
   .b-michelin { background: #bd1e2d; color: #fff; }
   .b-blackpearl { background: #1a1a1a; color: #e8c468; }
@@ -67,7 +75,14 @@
   .tline td { border: none; padding: 1.2mm 2mm; font-size: 9.8pt; }
   .tline tr:nth-child(even) td { background: transparent; }
   .tline .t { color: #0f6e4f; font-weight: 700; white-space: nowrap; width: 27mm; }
-  .card { border: 1px solid #dcd7cc; border-radius: 3mm; padding: 3.5mm 4.5mm; margin: 3mm 0; page-break-inside: avoid; background: #fffdf9; }
+  .card { border: 1px solid #dcd7cc; border-radius: 3mm; padding: 3.5mm 4.5mm; margin: 3mm 0; page-break-inside: avoid; background: #fffdf9; box-shadow: 0 0.8mm 2mm rgba(60,40,10,.07); }
+  /* 费用表：橙色主题 + 隐藏费用红色警示行 */
+  .fee th { background: linear-gradient(90deg, #c0551c, #e8642a); }
+  table.fee tr.hiddenfee td { background: #fdeeee; color: #b03a2e; font-weight: 600; }
+  /* 封面装饰 */
+  .cover .goldline { width: 30mm; height: 1.5mm; background: linear-gradient(90deg, #ffd9a8, #e8642a); border-radius: 1mm; margin-bottom: 6mm; }
+  .cover-art { position: absolute; bottom: 0; left: 0; width: 100%; height: 45mm; }
+  .cover .date { z-index: 2; }
   .card .name { font-size: 12pt; font-weight: 700; color: #0b3d2e; }
   .grid2 { display: flex; gap: 4mm; }
   .grid2 > div { flex: 1; }
@@ -95,6 +110,8 @@
   <h1>【目的地】</h1>
   <!-- 【填】副标题：如"嗦粉之城 · 山水龙城 ｜ 2日2晚攻略" -->
   <div class="sub">【填】目的地主题词 ｜ N日M晚攻略</div>
+  <!-- 金色分隔线（装饰，保留） -->
+  <div class="goldline"></div>
   <!-- 【填】路线行：交通路线 + 里程/时长/时间安排 -->
   <div class="route">
     🚗 【填】路线：出发地 —高速名→ 中转点 —→ 目的地<br>
@@ -107,6 +124,12 @@
     <div class="fact">🍜 【填】亮点 3</div>
     <div class="fact">💴 【填】亮点 4</div>
   </div>
+  <!-- 山峦剪影 + 落日装饰（内联 SVG，纯本地渲染，保留勿删） -->
+  <svg class="cover-art" viewBox="0 0 800 160" preserveAspectRatio="none" aria-hidden="true">
+    <polygon points="0,160 60,58 120,112 175,38 235,118 300,68 352,160" fill="rgba(255,255,255,.10)"/>
+    <polygon points="300,160 385,80 445,128 505,52 575,124 645,88 700,160" fill="rgba(255,255,255,.16)"/>
+    <circle cx="665" cy="48" r="24" fill="#ffd9a8"/>
+  </svg>
   <!-- 【填】具体日期（含星期） -->
   <div class="date">【填】XXXX.X.XX（周五）晚出发 — X.XX（周日）晚返回</div>
 </div>
@@ -147,25 +170,65 @@
   <tr><td class="k">备选方案</td><td>【填】中途过夜、改签班次等 Plan B</td></tr>
 </table>
 
-<!-- ==================== 第二章 景点深度榜 ==================== -->
+<!-- ==================== 第二章 景点深度榜 ====================
+     三层结构：① 总览表（含 A 级徽章）→ ② 必去景点逐卡详解 → ③ 驴友小众推荐
+     A 级徽章：b-5a / b-4a / b-3a；免票用 b-free；闭馆日用 b-tip；非遗表演用 b-show（带场次时间）
+     费用透明三件套：挂牌价+优惠人群 / 套票拆解（标省亏）/ 隐藏费用红色警示行
+     ==================== -->
 <h2 class="ch pagebreak"><span class="no">2</span>景点深度榜</h2>
-<table>
-  <tr><th style="width:7mm">排名</th><th>景点</th><th>门票</th><th>推荐</th><th>一句话亮点</th></tr>
-  <!-- 【填】每个景点一行：badge b-free/b-fee + b-tip（闭馆日等）；星级 .stars -->
-  <tr><td>1</td><td><b>【景点名】</b></td><td><span class="badge b-free">免费</span></td><td class="stars">★★★★★</td><td>【一句话亮点】</td></tr>
+<p class="chapintro">【填】本章导读：总览看全貌，详解卡给「文化故事 + 必玩清单 + 路线费用」，文末附驴友小众推荐。</p>
+
+<h3>📋 景点总览</h3>
+<table class="attr">
+  <tr><th style="width:7mm">排名</th><th>景点</th><th>景区级别</th><th>门票</th><th>推荐</th><th>一句话亮点</th></tr>
+  <!-- 【填】每个景点一行：级别用 b-5a/b-4a/b-3a/b-free；闭馆日加 b-tip；星级 .stars -->
+  <tr><td>1</td><td><b>【景点名】</b></td><td><span class="badge b-5a">5A</span></td><td><span class="badge b-fee">70 元</span></td><td class="stars">★★★★★</td><td>【一句话亮点】</td></tr>
 </table>
 
-<div class="warn">⏭️ <b>【填】主动放弃项：</b>太远/时间不够的景点列出并说明理由</div>
+<h3>🎯 必去景点详解</h3>
+<!-- 【填】每个必去景点复制一张详解卡；头牌景点全四块，次要景点可精简；文化内容无真实出处的整行删除 -->
+<div class="card">
+  <div class="name">【景点名】<span class="tag">【建议时段】</span></div>
+  <div class="authrow">
+    <span class="badge b-5a">5A 景区</span>
+    <span class="badge b-feiyi">非遗景区</span>
+    <span class="badge b-show">非遗表演</span>
+  </div>
+  <!-- ① 文化简介 -->
+  <table class="kv">
+    <tr><td class="k">🏛 历史文化</td><td>【填】朝代沿革/大事件</td></tr>
+    <tr><td class="k">📜 故事传说</td><td>【填】经典故事/神话</td></tr>
+    <tr><td class="k">👤 历史人物</td><td>【填】相关人物与事迹</td></tr>
+    <tr><td class="k">🏗 建筑看点</td><td>【填】风格/结构/年代</td></tr>
+    <tr><td class="k">🧧 非遗</td><td>【填】非遗景区/技艺；表演带场次时间（如"每日 10:00/15:00"）</td></tr>
+  </table>
+  <!-- ② 游玩清单 -->
+  <ul>
+    <li>⭐ <b>必玩：</b>【填】项目与建议</li>
+    <li>📸 <b>打卡点：</b>【填】具体机位</li>
+    <li>【填】可选项目与不推荐项目</li>
+  </ul>
+  <!-- ③④ 路线 + 费用透明三件套 -->
+  <table class="fee">
+    <tr><th style="width:30mm">费用项</th><th>说明</th></tr>
+    <tr><td>🎫 门票</td><td>【填】挂牌 XX 元｜半价/免费人群｜闭馆日</td></tr>
+    <tr><td>🎟 套票</td><td>【填】套票 XX 元 = 门票 + 小景点 A/B（单买合计 XX 元 → 省/亏 X 元）；不值的小景点直言可跳过</td></tr>
+    <tr><td>🚌 园内交通</td><td>【填】摆渡车 XX / 索道 XX / 电梯 XX / 游船 XX</td></tr>
+    <tr class="hiddenfee"><td>⚠️ 隐藏费用</td><td>【填】停车 XX、讲解 XX、照相点 XX——提前知道免尴尬</td></tr>
+    <tr><td>🚶 路线</td><td>【填】动线：XX 门进 → A → B → XX 门出，全程约 X 小时</td></tr>
+  </table>
+</div>
 
-<div class="grid2">
-  <div class="card">
-    <div class="name">【景点 1】<span class="tag">【建议时段】</span></div>
-    <ul><li>【填】必打卡点、游览时长、出入口、费用明细</li></ul>
-  </div>
-  <div class="card">
-    <div class="name">【景点 2】<span class="tag">【建议时段】</span></div>
-    <ul><li>【填】⚠️ 关键时间节点写这里</li></ul>
-  </div>
+<div class="warn">⏭️ <b>主动放弃项：</b>【填】太远/时间不够的景点列出并说明理由</div>
+
+<h3>🗺 驴友小众推荐</h3>
+<div class="card">
+  <div class="name">【小众景点名】<span class="tag">距市区 X km · 车程 X h</span></div>
+  <ul>
+    <li><b>为什么去：</b>【填】人少出片/徒步/航拍等场景与驴友口碑</li>
+    <li><b>路线：</b>【填】导航关键词 + 路况提醒（最后一段非铺装等）</li>
+    <li><b>费用：</b>【填】门票/停车/隐藏费用（无门票直说免费）</li>
+  </ul>
 </div>
 
 <!-- ==================== 第三章 美食地图 ==================== -->
