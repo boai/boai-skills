@@ -12,7 +12,7 @@
       "source": "./",
       "category": "utility",
       "tags": ["claude-code", "windows", "macos", "wechat", "token", "travel", "boai"],
-      "description": "全部技能一键安装（token 统计 / 文章撰写 / 影评 / 旅游攻略 / 搜狗去广告 / 360 清理 / 微信双开 / 微信防撤回）"
+      "description": "全部技能一键安装（token 统计 / 文章撰写 / 影评 / 旅游攻略 / 城市美食 / 搜狗去广告 / 360 清理 / 微信双开 / 微信防撤回）"
     },
     {
       "name": "claude-token-tracker",
@@ -39,6 +39,13 @@
       "skills": ["./skills/boai-travel-guide"],
       "strict": false,
       "description": "旅游攻略生成：行程编排 + 联网调研（路线/充电/景点/美食/住宿/预算）+ 精排版 PDF 交付，支持电车自驾充电规划"
+    },
+    {
+      "name": "boai-city-food",
+      "source": "./",
+      "skills": ["./skills/boai-city-food"],
+      "strict": false,
+      "description": "城市美食雷达：一句话搜一座城市最好吃的美食，按区域整理，星级推荐 + 店名/地址/菜价/人均，PDF 交付"
     },
     {
       "name": "sogou-ad-killer",

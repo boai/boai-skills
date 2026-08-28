@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>城市美食推荐模板</title>
+<!--
+  ============================================================
+  城市美食推荐 PDF 模板（boai-city-food）
+  ============================================================
+  用法：复制本文件为临时 HTML，按【填】注释替换内容，
+  用 scripts/html2pdf.sh 转 PDF。
+  规则：
+  1. 保留全部 CSS，只替换内容
+  2. 结构固定：封面 → ①美食总榜 → ②分区详解 → ③实用贴士+Sources
+  3. 星级色：5★ 用 .s5（金）4★ 用 .s4（橙）3★ 用 .s3（绿）
+  4. 每条推荐带：店名/地址/招牌菜价格/人均/权威标签/排队贴士
+  5. 封面背景图 base64 内嵌（拿不到删 img 和 grad 两行）
+  ============================================================
+-->
+<style>
+  @page { size: A4; margin: 15mm 13mm; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif; color: #2b2b2b; margin: 0; font-size: 10.5pt; line-height: 1.65; }
+  /* ---------- 封面 ---------- */
+  .cover { height: 257mm; background: #0b3d2e; color: #fff; border-radius: 6mm; position: relative; page-break-after: always; overflow: hidden; }
+  .cover::after { content: ""; position: absolute; right: -40mm; top: -40mm; width: 120mm; height: 120mm; border: 2mm solid rgba(255,255,255,.08); border-radius: 50%; }
+  .cover::before { content: ""; position: absolute; right: 10mm; bottom: 20mm; width: 70mm; height: 70mm; border: 1.5mm solid rgba(255,255,255,.06); border-radius: 50%; }
+  .cover .bgimg { position: absolute; top: 0; left: 0; width: 100%; height: 60%; object-fit: cover; object-position: 50% 55%; z-index: 0; }
+  .cover .grad { position: absolute; top: 51%; left: 0; width: 100%; height: 11%; background: linear-gradient(180deg, rgba(11,61,46,0), #0b3d2e); z-index: 1; }
+  .cover .band { position: absolute; bottom: 0; left: 0; width: 100%; height: 40%; background: #0b3d2e; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 6mm 16mm 18mm; }
+  .cover h1 { font-size: 40pt; margin: 0 0 2mm; letter-spacing: 6px; }
+  .cover .en { font-size: 9.5pt; letter-spacing: 8px; color: #9fd6bd; text-transform: uppercase; margin-bottom: 6mm; }
+  .cover .slogan { font-size: 13pt; color: #ffe9c9; font-weight: 600; letter-spacing: 1px; margin-bottom: 9mm; }
+  .cover .slogan .q { color: #ffd9a8; }
+  .cover .feats { font-size: 9.5pt; color: #9fd6bd; letter-spacing: 1px; }
+  .cover .feats b { color: #ffd9a8; font-weight: 700; }
+  .cover .feats .sep { margin: 0 3mm; color: rgba(159,214,189,.45); }
+  .cover .sign { position: absolute; bottom: 6mm; right: 8mm; font-size: 8.5pt; letter-spacing: 1px; color: #9fd6bd; z-index: 3; }
+  .cover .date { position: absolute; bottom: 6.5mm; left: 8mm; font-size: 8pt; color: rgba(159,214,189,.8); z-index: 3; }
+  /* ---------- 章节头 ---------- */
+  h2.ch { font-size: 17pt; color: #0b3d2e; border-left: 4mm solid #e8642a; background: linear-gradient(90deg, #fdf3ec, rgba(253,243,236,0)); border-radius: 2mm; padding: 2.5mm 4mm; margin: 10mm 0 5mm; }
+  h2.ch .no { display: inline-block; background: linear-gradient(135deg, #e8642a, #f09a3e); color: #fff; font-size: 11pt; border-radius: 1.5mm; padding: 0.5mm 2.5mm; margin-right: 3mm; vertical-align: 2px; }
+  .ch-sub { display: block; font-size: 8pt; letter-spacing: 4px; color: #b08a5a; margin-top: 1.2mm; font-weight: 400; }
+  h3 { font-size: 12.5pt; color: #0f6e4f; margin: 7mm 0 1mm; padding-bottom: 1mm; border-bottom: 0.5mm solid #e8e2d5; }
+  h3 .mood { font-size: 9pt; color: #999; font-weight: 400; margin-left: 3mm; }
+  p { margin: 1.5mm 0; }
+  .chapintro { font-size: 9.5pt; color: #777; margin: -1mm 0 3mm; }
+  table { width: 100%; border-collapse: collapse; margin: 3mm 0; font-size: 9.8pt; }
+  th { background: linear-gradient(90deg, #0f6e4f, #1d8a63); color: #fff; padding: 2.2mm 2.5mm; text-align: left; font-weight: 600; }
+  td { padding: 2.2mm 2.5mm; border-bottom: 1px solid #e3e0d8; vertical-align: top; }
+  tr:nth-child(even) td { background: #f6f3ec; }
+  .food th { background: #eef2ee; color: #0b3d2e; }
+  /* 星级 */
+  .s5 { color: #c9a227; letter-spacing: 1px; white-space: nowrap; font-weight: 700; }
+  .s4 { color: #e8642a; letter-spacing: 1px; white-space: nowrap; font-weight: 700; }
+  .s3 { color: #3e8e5a; letter-spacing: 1px; white-space: nowrap; }
+  /* 权威度徽章 */
+  .badge { display: inline-block; font-size: 8.5pt; border-radius: 1.5mm; padding: 0.3mm 2mm; margin-right: 1.5mm; }
+  .b-michelin { background: #bd1e2d; color: #fff; }
+  .b-blackpearl { background: #1a1a1a; color: #e8c468; }
+  .b-bibang { background: #ff7a00; color: #fff; }
+  .b-feiyi { background: #8b4513; color: #fff; }
+  .b-laozihao { background: #a67c00; color: #fff; }
+  .b-kol { background: #00838f; color: #fff; }
+  .b-local { background: #2e7d32; color: #fff; }
+  .badges { margin: 0.5mm 0; }
+  /* ---------- 卡片与提示 ---------- */
+  .card { border: 1px solid #dcd7cc; border-radius: 3mm; padding: 3.5mm 4.5mm; margin: 3mm 0; page-break-inside: avoid; background: #fffdf9; box-shadow: 0 0.8mm 2mm rgba(60,40,10,.07); }
+  .card .name { font-size: 12pt; font-weight: 700; color: #0b3d2e; }
+  ul { margin: 2mm 0; padding-left: 6mm; }
+  li { margin: 1.2mm 0; }
+  .rule { border-left: 1mm solid #e8642a; background: #fdf3ec; border-radius: 1.5mm; padding: 2.5mm 3.5mm; margin: 3mm 0; }
+  .warn { border-left: 1mm solid #c0392b; background: #fdeeee; border-radius: 1.5mm; padding: 2.5mm 3.5mm; margin: 3mm 0; }
+  .sources { font-size: 8.5pt; color: #666; }
+  .sources a { color: #0f6e4f; text-decoration: none; word-break: break-all; }
+  .pagebreak { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<!-- ==================== 封面 ==================== -->
+<div class="cover">
+  <!-- 【填】封面图：城市代表美食/地标图 base64 内嵌；拿不到删掉 img 和 grad 两行 -->
+  <img class="bgimg" src="data:image/jpeg;base64,【填】图片BASE64" alt="">
+  <div class="grad"></div>
+  <div class="band">
+    <h1>【城市名】</h1>
+    <div class="en">【填】GUANGZHOU · FOOD GUIDE</div>
+    <!-- 【填】美食宣传语：检索「城市 美食 口号」，或自拟贴切金句 -->
+    <div class="slogan">「<span class="q">【填】食在广州</span>」<span style="color:#9fd6bd;font-size:10.5pt">　【填】一盅两件叹世界</span></div>
+    <!-- 【填】数字条：必吃美食数 / 推荐店数 / 覆盖区数 -->
+    <div class="feats"><b>5</b> 道必吃美食<span class="sep">·</span><b>24</b> 家推荐店<span class="sep">·</span><b>6</b> 个区全覆盖</div>
+    <div class="date">【填】2026 年 8 月更新 · 价格以门店当日为准</div>
+    <div class="sign">Designed by boai</div>
+  </div>
+</div>
+
+<!-- ==================== 第一章 美食总榜 ==================== -->
+<h2 class="ch pagebreak"><span class="no">1</span>美食总榜<span class="ch-sub">TOP FOODS RANKED</span></h2>
+<p class="chapintro">【填】城市级招牌菜按星级定档：★★★★★ 必吃（不吃等于没来）｜★★★★☆ 值得专程｜★★★☆ 顺路可吃。分区详单见第二章。</p>
+<table class="food">
+  <tr><th style="width:16mm">星级</th><th>美食 · 代表店（地址）</th><th>招牌菜（价格）</th><th>人均</th><th>权威标签 / 贴士</th></tr>
+  <tr>
+    <td class="s5">★★★★★</td>
+    <td><b>【美食名】</b><br>【代表店 · 地址】</td>
+    <td>【招牌菜 价格】</td>
+    <td>约 XX 元</td>
+    <td><div class="badges"><span class="badge b-laozihao">老字号</span><span class="badge b-bibang">必吃榜</span></div>【排队贴士】</td>
+  </tr>
+</table>
+<div class="rule">💡 <b>【填】总榜说明：</b>如「5★ 是城市名片级招牌；4★ 由各区头牌组成，详见分区章」</div>
+
+<!-- ==================== 第二章 分区详解 ==================== -->
+<h2 class="ch pagebreak"><span class="no">2</span>分区详解<span class="ch-sub">BY DISTRICT</span></h2>
+<p class="chapintro">【填】按行政区逐区整理：区首一句该区美食气质，下面 TOP 3-5 家可照走清单。</p>
+
+<h3>【区名 1】<span class="mood">【填】该区美食气质一句话</span></h3>
+<table class="food">
+  <tr><th style="width:16mm">星级</th><th>店名 · 地址</th><th>招牌菜（价格）</th><th>人均</th><th>权威标签 / 贴士</th></tr>
+  <tr>
+    <td class="s5">★★★★★</td>
+    <td><b>【店名】</b><br>【地址：商圈/街道 + 导航关键词】</td>
+    <td>【招牌菜 价格】<br>【招牌菜 2 价格】</td>
+    <td>约 XX 元</td>
+    <td><div class="badges"><span class="badge b-bibang">必吃榜</span></div>【贴士：营业时间/排队规律】</td>
+  </tr>
+</table>
+
+<h3>【区名 2】<span class="mood">【填】该区美食气质一句话</span></h3>
+<table class="food">
+  <tr><th style="width:16mm">星级</th><th>店名 · 地址</th><th>招牌菜（价格）</th><th>人均</th><th>权威标签 / 贴士</th></tr>
+  <tr>
+    <td class="s4">★★★★☆</td>
+    <td><b>【店名】</b><br>【地址】</td>
+    <td>【招牌菜 价格】</td>
+    <td>约 XX 元</td>
+    <td><div class="badges"><span class="badge b-local">本地人最爱</span></div>【贴士】</td>
+  </tr>
+</table>
+
+<!-- ==================== 第三章 实用贴士 ==================== -->
+<h2 class="ch pagebreak"><span class="no">3</span>实用贴士<span class="ch-sub">TIPS & SOURCES</span></h2>
+<ul>
+  <li><b>排队规律：</b>【填】城市级贴士（如早茶 9 点前不用排、老店下午售罄）</li>
+  <li><b>口味提醒：</b>【填】辣度/咸甜度/地方口味特点，外省游客注意事项</li>
+  <li><b>消费参考：</b>【填】人均区间、茶位费/服务费类隐藏收费</li>
+  <li><b>伴手礼：</b>【填】可带走的特产（品牌+参考价）</li>
+</ul>
+
+<p class="sources" style="margin-top:8mm"><b>信息来源（【填】检索年月）：</b><br>
+· 【填】<a href="【URL】">【来源标题】</a><br>
+· 【填】每条来源一行，保留完整链接（含封面图出处与协议）<br>
+提示：价格、人均与榜单为公开渠道汇总，出行前以门店当日为准。</p>
+
+</body>
+</html>

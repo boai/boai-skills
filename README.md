@@ -39,6 +39,7 @@
 | 📝 boai-article-writer | `/plugin install boai-article-writer@boai-skills` |
 | 🎬 boai-film-review | `/plugin install boai-film-review@boai-skills` |
 | ✈️ boai-travel-guide | `/plugin install boai-travel-guide@boai-skills` |
+| 🍜 boai-city-food | `/plugin install boai-city-food@boai-skills` |
 | 🧹 sogou-ad-killer | `/plugin install sogou-ad-killer@boai-skills` |
 | 🔧 360-cleaner | `/plugin install 360-cleaner@boai-skills` |
 | 💬 mac-wechat-dual-instance | `/plugin install mac-wechat-dual-instance@boai-skills` |
@@ -66,6 +67,12 @@
 | 技能 | 说明 | 触发词 |
 |------|------|--------|
 | ✈️ **boai-travel-guide** | 旅游攻略生成：行程编排 + 联网调研（路线/充电/景点/美食/住宿/预算）+ 精排版 PDF 交付，支持电车自驾充电规划 | `旅游攻略` `自驾` `周末去哪玩` `X日游` `行程规划` |
+
+### 🍜 城市美食（技能，提到触发词时启用）
+
+| 技能 | 说明 | 触发词 |
+|------|------|--------|
+| 🍜 **boai-city-food** | 一句话搜一座城市最好吃的美食：按区域整理，星级推荐 + 店名/地址/菜价/人均，PDF 交付 | `美食推荐` `有什么好吃的` `必吃` `探店` |
 
 ### 🪟 Windows
 
