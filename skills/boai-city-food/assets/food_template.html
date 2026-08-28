@@ -63,6 +63,15 @@
   .b-laozihao { background: #a67c00; color: #fff; }
   .b-kol { background: #00838f; color: #fff; }
   .b-local { background: #2e7d32; color: #fff; }
+  /* 菜系徽章 */
+  .b-yue { background: #0f6e4f; color: #fff; }
+  .b-chaoshan { background: #005f73; color: #fff; }
+  .b-kejia { background: #7b5e3b; color: #fff; }
+  .b-chuan { background: #c0392b; color: #fff; }
+  .b-xiang { background: #b9770e; color: #fff; }
+  .b-tianpin { background: #d81b60; color: #fff; }
+  .b-xiaochi { background: #4a4a6a; color: #fff; }
+  .b-zaocha { background: #8a5a00; color: #fff; }
   .badges { margin: 0.5mm 0; }
   /* ---------- 卡片与提示 ---------- */
   .card { border: 1px solid #dcd7cc; border-radius: 3mm; padding: 3.5mm 4.5mm; margin: 3mm 0; page-break-inside: avoid; background: #fffdf9; box-shadow: 0 0.8mm 2mm rgba(60,40,10,.07); }
@@ -99,9 +108,10 @@
 <h2 class="ch pagebreak"><span class="no">1</span>美食总榜<span class="ch-sub">TOP FOODS RANKED</span></h2>
 <p class="chapintro">【填】城市级招牌菜按星级定档：★★★★★ 必吃（不吃等于没来）｜★★★★☆ 值得专程｜★★★☆ 顺路可吃。分区详单见第二章。</p>
 <table class="food">
-  <tr><th style="width:16mm">星级</th><th>美食 · 代表店（地址）</th><th>招牌菜（价格）</th><th>人均</th><th>权威标签 / 贴士</th></tr>
+  <tr><th style="width:16mm">星级</th><th>菜系</th><th>美食 · 代表店（地址）</th><th>招牌菜（价格）</th><th>人均</th><th>权威标签 / 贴士</th></tr>
   <tr>
     <td class="s5">★★★★★</td>
+    <td><span class="badge b-yue">粤菜</span></td>
     <td><b>【美食名】</b><br>【代表店 · 地址】</td>
     <td>【招牌菜 价格】</td>
     <td>约 XX 元</td>
@@ -110,31 +120,37 @@
 </table>
 <div class="rule">💡 <b>【填】总榜说明：</b>如「5★ 是城市名片级招牌；4★ 由各区头牌组成，详见分区章」</div>
 
-<!-- ==================== 第二章 分区详解 ==================== -->
-<h2 class="ch pagebreak"><span class="no">2</span>分区详解<span class="ch-sub">BY DISTRICT</span></h2>
-<p class="chapintro">【填】按行政区逐区整理：区首一句该区美食气质，下面 TOP 3-5 家可照走清单。</p>
+<!-- ==================== 第二章 按菜系分章 ====================
+     每家店带菜系徽章：b-yue 粤菜 / b-zaocha 早茶 / b-xiaochi 小吃
+     b-tianpin 甜品 / b-chaoshan 潮汕 / b-kejia 客家 / b-chuan 川菜 / b-xiang 湘菜
+     本地视角优先：街坊老店为主，连锁 ≤2 家标「备选」
+     ==================== -->
+<h2 class="ch pagebreak"><span class="no">2</span>按菜系寻味<span class="ch-sub">BY CUISINE</span></h2>
+<p class="chapintro">【填】按菜系分章：想吃哪口翻哪章；每家店带菜系徽章与本地口碑标签，连锁品牌标「备选」。</p>
 
-<h3>【区名 1】<span class="mood">【填】该区美食气质一句话</span></h3>
+<h3>【菜系 1】<span class="mood">【填】该菜系在本地的一句话气质</span></h3>
 <table class="food">
-  <tr><th style="width:16mm">星级</th><th>店名 · 地址</th><th>招牌菜（价格）</th><th>人均</th><th>权威标签 / 贴士</th></tr>
+  <tr><th style="width:16mm">星级</th><th>菜系</th><th>店名 · 地址</th><th>招牌菜（价格）</th><th>人均</th><th>权威标签 / 贴士</th></tr>
   <tr>
     <td class="s5">★★★★★</td>
-    <td><b>【店名】</b><br>【地址：商圈/街道 + 导航关键词】</td>
+    <td><span class="badge b-yue">粤菜</span></td>
+    <td><b>【店名】</b><br>【地址：街道/商圈 + 导航关键词】</td>
     <td>【招牌菜 价格】<br>【招牌菜 2 价格】</td>
     <td>约 XX 元</td>
-    <td><div class="badges"><span class="badge b-bibang">必吃榜</span></div>【贴士：营业时间/排队规律】</td>
+    <td><div class="badges"><span class="badge b-michelin">米其林</span><span class="badge b-local">本地人最爱</span></div>【贴士：营业时间/排队规律】</td>
   </tr>
 </table>
 
-<h3>【区名 2】<span class="mood">【填】该区美食气质一句话</span></h3>
+<h3>【菜系 2】<span class="mood">【填】一句话气质</span></h3>
 <table class="food">
-  <tr><th style="width:16mm">星级</th><th>店名 · 地址</th><th>招牌菜（价格）</th><th>人均</th><th>权威标签 / 贴士</th></tr>
+  <tr><th style="width:16mm">星级</th><th>菜系</th><th>店名 · 地址</th><th>招牌菜（价格）</th><th>人均</th><th>权威标签 / 贴士</th></tr>
   <tr>
     <td class="s4">★★★★☆</td>
+    <td><span class="badge b-zaocha">早茶</span></td>
     <td><b>【店名】</b><br>【地址】</td>
     <td>【招牌菜 价格】</td>
     <td>约 XX 元</td>
-    <td><div class="badges"><span class="badge b-local">本地人最爱</span></div>【贴士】</td>
+    <td><div class="badges"><span class="badge b-laozihao">老字号</span></div>【贴士】</td>
   </tr>
 </table>
 
