@@ -140,7 +140,7 @@ metadata:
 
 1. 读取本 skill 目录 `assets/food_template.html`，按注释槽位填充（保留全部 CSS）
 2. 结构固定：**封面 / ①城市总榜 TOP 10/ ②分区详解（每区 10-15 家）/ ③四大榜单速览（米其林星级榜·必比登推介·必吃榜·黑珍珠，完整名单附录）/ ④索引（人均价格带 + 场景）/ ⑤实用贴士 + Sources + 版本日志**；区级模式为 **封面 / ①该区前 30 家（最低 10 家）/ ②榜单速览 / ③实用贴士+Sources**
-3. 封面：城市名（中英双语）+ 美食宣传语 + 数字条（总榜 10 家 / N 家推荐 / N 个区）+ `Designed by boai`；背景图优先用**城市代表性地标/美食图**（Wikimedia Commons 走 Clash 代理 `-x http://127.0.0.1:7890` + User-Agent 头；Wikimedia 被墙且代理未开时的国内兜底：360 图片 JSON 接口 `image.so.com/j?q=关键词&src=srp&pn=1&sn=30` 带 Referer `image.so.com/` 取列表 → 挑 `img` 字段含 `*.baidu.com/it/` 的项 → 带 Referer `image.baidu.com/` 下载高清图），base64 内嵌，来源写进 Sources；拿不到就删掉 img 与 grad 行
+3. 封面：城市名（中英双语）+ 美食宣传语 + 数字条（总榜 10 家 / N 家推荐 / N 个区）+ `Designed by boai`；底部色带用**黑色半透明**（黑底 #0b0b0d），图片与文字区之间用**加长渐变带**（图高 62% + 渐变带 42%→62%）平滑衔接，避免生硬切边；背景图优先用**城市代表性地标/美食图**（Wikimedia Commons 走 Clash 代理 `-x http://127.0.0.1:7890` + User-Agent 头；Wikimedia 被墙且代理未开时的国内兜底：360 图片 JSON 接口 `image.so.com/j?q=关键词&src=srp&pn=1&sn=30` 带 Referer `image.so.com/` 取列表 → 挑 `img` 字段含 `*.baidu.com/it/` 的项 → 带 Referer `image.baidu.com/` 下载高清图），base64 内嵌，来源写进 Sources；拿不到就删掉 img 与 grad 行
 4. **版本日志**：文末记录本版新增/修正/淘汰的店与规则变更；输出文件命名为 `{城市}美食推荐.pdf`，大改版另存 `{城市}美食推荐_{版本名}.pdf` **不覆盖旧版**（用户要对比时保留全部历史版本）
 
 ### 表格版式规范（用户指令 2026-09-08）
