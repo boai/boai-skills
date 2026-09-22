@@ -14,7 +14,7 @@ triggers:
   - wechat plugin
   - 微信插件
 platform: darwin
-verified: macOS 15 Sequoia + 微信 4.1.x + Apple Silicon (M1/M2/M3)
+verified: macOS 26 + 微信 4.1.10 (build 268851) + Apple Silicon (M1 Pro) 实测；macOS 15 + 微信 4.1.x 亦可用
 ---
 
 # Mac 微信防撤回
@@ -86,6 +86,8 @@ sudo sh install.sh
 - **支持架构**: Apple Silicon + Intel（通用）
 - **微信兼容**: ≤ 4.0.x（4.1 以上未经充分测试）
 
+> **4.1+ 用户请看这里**：上游停在 ≤ 4.0 已久，4.1 及以上请用社区维护的 fork [naizhao/WeChatTweak](https://github.com/naizhao/WeChatTweak)（持续更新 config.json 里的字节补丁偏移）。它是**字节补丁**而非 dylib 注入，原理、验证方法与实测踩坑见下文「字节补丁方案实操与踩坑」。
+
 ### 安装方式
 
 #### brew 安装（推荐）
@@ -126,6 +128,66 @@ sudo wechattweak-cli uninstall
 - **项目**: [WeChatIntercept](https://gitcode.com/gh_mirrors/we/WeChatIntercept)
 - **特点**: 一键安装脚本、免认证登录、自定义拦截提示
 - **限制**: 仅支持微信 v3.7.0+，已停更，不推荐新用户使用
+
+---
+
+## 进阶：字节补丁方案实操与踩坑（naizhao/WeChatTweak fork · 2026-09 实测）
+
+方案一/二是「注入 framework / dylib」；4.x 上还有一类**字节补丁**方案：社区 fork [naizhao/WeChatTweak](https://github.com/naizhao/WeChatTweak)（上游 sunnyyoung 停在 4.0，此 fork 持续维护 4.x 的偏移配置）。下文全部在 macOS 26 + 微信 4.1.10（build 268851）+ Apple Silicon 上实测过。
+
+### 原理（读源码确认）
+
+- `wechattweak patch` 把 config.json 里每个 build 的 `asm` 字节写到 `addr` 指定的虚拟地址；**目标是 `Contents/Resources/wechat.dylib`（300 MB+），不是主程序**（主程序只有几 MB —— 这是腾讯自己的布局，不是插件挪的）
+- arm64 的防撤回补丁是 `20008052c0035fd6`（`mov w0, #1; ret`，让某个判断恒为真）；x86_64 另有一条多开补丁（6 × NOP）
+- 同一地址写同一字节 → **重复执行是幂等的**，不会打坏；前提是 build 号在 config 支持列表里：
+
+```bash
+~/tools/WeChatTweak/wechattweak versions --app /Applications/WeChat.app
+```
+
+### 装完先验证（不必真找人撤回一次）
+
+`scripts/check_patch.py` 反向解析 config 的 `addr`，按 Mach-O segment 换算出文件偏移，读实际字节比对：
+
+```bash
+python3 scripts/check_patch.py 268851                                  # 参数 = CFBundleVersion
+python3 scripts/check_patch.py 268851 --app /Applications/微信1.app     # 多开副本同理
+```
+
+期望两处 `✅ 补丁在`。**「字节在」≠「功能生效」**：字节正确 + 载荷确实被进程加载（`lsof -p <pid> | grep Resources/wechat.dylib`）只是必要条件，最终仍需一次真实撤回事件验证。
+
+### 三个实测踩坑
+
+**1. 签名顺序：先重签嵌套载荷，再封 bundle**
+
+先 `codesign --force --deep --sign -` 封完整个 bundle、**之后**才单独重签 `Contents/Resources/wechat.dylib`（naizhao 工具当前就是这个顺序），会让 `CodeResources` 与最终签名不一致 —— 验证时报 `a sealed resource is missing or invalid`。后果不止是报错：macOS 每次重启都会重新校验敏感权限签名，**反复作废屏幕录制授权、反复弹框**。补完之后必须再来一次 `codesign --force --deep --sign -` 把 bundle 封正。
+
+**2. 任何重签之后，必须重置屏幕录制授权**
+
+TCC 按 **cdhash** 记录授权，重签即失效。典型症状：**微信截图提示「没有权限」，但系统设置里的开关明明是开的**（开关指向的是旧 cdhash 那条记录）。
+
+```bash
+tccutil reset ScreenCapture com.tencent.xinWeChat
+# 然后回微信截一次图 → 系统弹框 → 允许（一次干净授权）
+```
+
+多次重签会累积重复授权行，reset 会一并清掉（对每条旧记录各报一次 Successfully reset）。
+
+**3. 不要下意识用 sudo**
+
+`/Applications` 下的微信通常就归你所有，patch 与重签都**不需要 root**。用 sudo 跑反而会把 `_CodeSignature/CodeResources` 变成 root 属主，导致之后无法正常重签（真遇到才需要 `sudo chown -R "$(whoami):admin" /Applications/WeChat.app`）。
+
+同理：若机器上 `xattr` 被 Python 版包覆盖（`~/Library/Python/*/bin/xattr`，且只有 x86_64），`xattr -cr` 会因架构不兼容报 ImportError —— 用系统原版 `/usr/bin/xattr -cr /Applications/WeChat.app` 收尾。
+
+### 多开副本能不能也带上防撤回？
+
+能：把它从**已打补丁的主 App 复制**过去（字节副本自带补丁），再改 Bundle ID + 重签即可；容器按 Bundle ID 走，登录数据不受影响。但反向不成立 —— 副本若停在旧版本、且其 build 不在 config 支持列表里，**没法单独给它打补丁**（工具直接拒绝），只能靠复制刷新。
+
+### 关于「禁用更新」的真相
+
+微信 macOS 版内置 **Sparkle 自动更新**（`Info.plist` 里有 `SUPublicEDKey`，缓存目录 `~/Library/Caches/com.tencent.xinWeChat/org.sparkle-project.Sparkle`），而且**升级是静默的、不询问用户**：实测 2026-06-09 微信在无人操作的情况下把自己从 4.1.9 升到 4.1.10，插件随之失效、需要重打（更新后的 App 带着全新载荷和签名）。
+
+想真正拦住得阻断更新域名或替换更新机制；本 skill 目前**没有**经完整验证的拦截方案 —— 别轻信"勾个开关就行"。
 
 ---
 
@@ -267,6 +329,9 @@ ls /Applications/WeChat.app/Contents/MacOS/WeChatTweak.framework 2>/dev/null && 
 
 # 或检查 X1a0He 的安装标记
 ls /Applications/WeChat.app/Contents/MacOS/WeChatPlugin.framework 2>/dev/null && echo "X1a0He installed" || echo "X1a0He not found"
+
+# 字节补丁类（naizhao fork）：直接验补丁字节，比找文件可靠
+python3 scripts/check_patch.py "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' /Applications/WeChat.app/Contents/Info.plist)" 2>/dev/null
 ```
 
 ### 第 5 步：提示用户
@@ -288,6 +353,23 @@ ls /Applications/WeChat.app/Contents/MacOS/WeChatPlugin.framework 2>/dev/null &&
 2. 重新打开微信
 3. 检查插件设置面板中防撤回功能是否开启
 4. 如果仍不生效，尝试重启 Mac
+
+### 装完 / 重装后，微信截图提示「没有权限」，但系统设置里明明是开的
+
+重签导致的 TCC 授权漂移（授权按 cdhash 记录，重签后旧授权作废）：
+
+```bash
+tccutil reset ScreenCapture com.tencent.xinWeChat
+# 回微信截一次图 → 弹框 → 允许
+```
+
+详见上文「字节补丁方案实操与踩坑」第 2 条。
+
+### 怎么确认防撤回真的生效了（不想麻烦别人撤回消息）
+
+1. 字节补丁类方案先验字节：`python3 scripts/check_patch.py <CFBundleVersion>`，两处都 `✅ 补丁在`
+2. 再验功能，最省事的是**双开自测**：小号发一条消息给主号 → 小号撤回 → 看主号窗口里那条是否还在（还在 = 生效）
+3. 「字节在」不等于「功能生效」—— 别只看安装脚本打印的成功提示
 
 ### 微信更新后插件失效
 
@@ -342,3 +424,5 @@ sudo rm -rf /Applications/WeChat.app/Contents/MacOS/WeChatTweak.framework
 | 4.0.x | ✅ | ✅ v1.5.0 | ❌ |
 | 3.7.x ~ 3.9.x | ❌ | ✅ | ✅ |
 | 3.6.x 及更早 | ❌ | ⚠️ 部分 | ✅ |
+
+> 4.1.x 上另有 **naizhao/WeChatTweak** fork（字节补丁方案，实测 4.1.10 / build 268851 可用）；「安装成功」别只看脚本提示，用 `scripts/check_patch.py` 验字节 + 一次真实撤回验功能。
