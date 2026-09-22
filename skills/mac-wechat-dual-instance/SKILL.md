@@ -13,7 +13,7 @@ triggers:
   - 多开微信
   - wechat multi open
 platform: darwin
-verified: macOS 15 Sequoia + 微信 4.x + Apple Silicon (M1/M2/M3)
+verified: macOS 26 + 微信 4.1.10 (build 268851) + Apple Silicon (M1 Pro) 实测；macOS 15 + 微信 4.x 亦可用
 ---
 
 # Mac 微信双开/多开
@@ -96,6 +96,42 @@ chmod +x ~/wechat-multi.sh
 
 如果已安装 WeChatTweak-macOS 或 X1a0HeWeChatPlugin（见防撤回 skill），这些插件自带了多开功能，无需额外操作。详见 `mac-wechat-anti-recall` skill。
 
+## 刷新分身到最新版本（顺带继承防撤回补丁）· 2026-09 实测
+
+**分身不会自动更新**：微信的 Sparkle 更新器只管主 App（`/Applications/WeChat.app`），副本从复制那一刻就冻住了。实测：主 App 已升到 4.1.10 时，三个多月前复制的分身仍停在 4.1.9。
+
+刷新方式就是**重新从主 App 复制一遍**（不是就地升级）：
+
+```bash
+APP=/Applications/WeChat2.app
+
+# 0. 先退出分身；确认磁盘有 ~1.5G（APFS 是写时复制，几乎不额外占空间）
+mv "$APP" ~/tools/WeChat2.app.旧版备份           # 同卷 mv：瞬间、不占空间、可回滚（别急着 rm）
+ditto /Applications/WeChat.app "$APP"           # ditto 比 cp -R 更可靠，且走 APFS clone
+
+# 1. 改回原分身身份（Bundle ID 决定容器，保持同值 = 登录数据继续用）
+/usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier com.tencent.xinWeChat2" "$APP/Contents/Info.plist"
+/usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName 微信2" "$APP/Contents/Info.plist"
+
+# 2. 重签名：先重签嵌套载荷、再封 bundle（顺序不能反）
+[ -f "$APP/Contents/Resources/wechat.dylib" ] && codesign --force --sign - "$APP/Contents/Resources/wechat.dylib"
+codesign --force --deep --sign - "$APP"
+codesign --verify --deep --strict "$APP"
+
+# 3. 让 LaunchServices 重新认识它（刚换完目录时首次 open 可能毫无反应）
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$APP"
+```
+
+### 几个容易踩的点
+
+| 事情 | 说明 |
+|------|------|
+| **防撤回会一起继承** | 字节补丁写在 App 的载荷文件里，复制即带走 —— 所以「多开 + 防撤回」不用装两遍插件（验证：`scripts/check_patch.py`，见 `mac-wechat-anti-recall` skill） |
+| **登录数据安全** | 容器 `~/Library/Containers/<Bundle ID>` 按 Bundle ID 走，原地刷新不动它；但跨大版本升级仍可能要求重新扫码 |
+| **通常不需要 sudo** | `/Applications` 下的微信一般归你所有，复制/改 plist/签名都不需要 root。用 sudo 反而会把 `_CodeSignature/CodeResources` 变成 root 属主，导致之后无法重签（真遇到才需要 `sudo chown -R "$(whoami):admin"`） |
+| **先载荷后 bundle** | 顺序反了会让 `CodeResources` 与最终签名不一致，在 macOS 26 上表现为**反复索要屏幕录制权限**（详见防撤回 skill） |
+| **首次打开可能没反应** | 刚换完目录时 LaunchServices 有缓存，先 `lsregister -f`（或等几秒）再 `open` |
+
 ## 自动化执行流程
 
 当触发此 skill 时，按以下步骤执行：
@@ -140,7 +176,7 @@ codesign -dvvv /Applications/WeChat2.app 2>&1 | head -5
 1. ✅ 微信分身 WeChat2.app 已创建，位于 `/Applications/WeChat2.app`
 2. 🔍 在「应用程序」文件夹中找到 WeChat2.app，双击打开并扫码登录
 3. ⚠️ **每次微信更新后**，分身副本需要重建（运行 `rebuild` 命令）
-4. 💡 建议关闭微信自动更新：微信 → 设置 → 通用 → 取消「自动升级微信」
+4. ⚠️ 微信 macOS 版的升级是**静默**的（内置 Sparkle，实测会在无人操作时自动把主 App 从 4.1.9 升到 4.1.10）；设置里就算有自动升级开关也别指望一定拦得住 —— 分身失效时按上文「刷新分身到最新版本」重建即可
 5. 📝 如需卸载分身：直接删除 `/Applications/WeChat2.app` 即可
 
 ## 常见问题与解决方法
@@ -169,15 +205,18 @@ sudo mv ~/Desktop/WeChat2.app /Applications/WeChat2.app
 
 ### 微信更新后分身失效
 
-**原因**：微信更新只更新原版 `/Applications/WeChat.app`，分身仍是旧版本，可能不兼容新数据格式或登录协议。
+**原因**：微信更新只更新原版 `/Applications/WeChat.app`（副本连自动更新都没有，长期停在旧版本），可能不兼容新数据格式或登录协议。
 
-**解决**：重新执行步骤 1-3（复制新版微信并修改 Bundle ID）：
+**解决**：按上文「刷新分身到最新版本」重做一遍。要点是**先把旧副本 mv 归档再复制**（不要先 `rm -rf` —— 出问题还能回滚）：
 
 ```bash
-sudo rm -rf /Applications/WeChat2.app
-sudo cp -R /Applications/WeChat.app /Applications/WeChat2.app
-sudo /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier com.tencent.xinWeChat2" /Applications/WeChat2.app/Contents/Info.plist
-sudo codesign --force --deep --sign - /Applications/WeChat2.app
+mv /Applications/WeChat2.app ~/tools/WeChat2.app.旧版备份
+ditto /Applications/WeChat.app /Applications/WeChat2.app
+/usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier com.tencent.xinWeChat2" /Applications/WeChat2.app/Contents/Info.plist
+[ -f /Applications/WeChat2.app/Contents/Resources/wechat.dylib ] && \
+  codesign --force --sign - /Applications/WeChat2.app/Contents/Resources/wechat.dylib
+codesign --force --deep --sign - /Applications/WeChat2.app
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f /Applications/WeChat2.app
 ```
 
 或使用脚本的 `rebuild` 命令（方法二）。
@@ -231,7 +270,7 @@ sudo codesign --force --deep --sign - /Applications/WeChat2.app
 
 | 方案 | 安全性 | 简便度 | 微信 4.x 支持 | 防撤回 | 维护状态 |
 |------|:------:|:------:|:-----------:|:------:|:------:|
-| **本方案（复制+重签名）** | 🟢 最安全 | ⭐⭐⭐ | ✅ | ❌ | 永久有效 |
+| **本方案（复制+重签名）** | 🟢 最安全 | ⭐⭐⭐ | ✅ | ✅ 从已打补丁的主 App 复制即继承 | 永久有效 |
 | WeChatTweak-macOS | 🟡 注入插件 | ⭐⭐ | 需验证 | ✅ | 较慢 |
 | X1a0HeWeChatPlugin | 🟡 注入插件 | ⭐⭐⭐ | ✅ | ✅ | 活跃 |
 | 旧版 open -n 命令 | N/A | ⭐ | ❌ 已失效 | ❌ | 已失效 |
