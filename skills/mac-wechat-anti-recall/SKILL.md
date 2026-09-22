@@ -14,7 +14,7 @@ triggers:
   - wechat plugin
   - 微信插件
 platform: darwin
-verified: macOS 26 + 微信 4.1.10 (build 268851) + Apple Silicon (M1 Pro) 实测；macOS 15 + 微信 4.1.x 亦可用
+verified: macOS 27 + 微信 4.1.15 (build 270100) + Apple Silicon 实测（X1a0HeWeChatPlugin v2.10.0，2026-09）；macOS 26 + 微信 4.1.10 (build 268851) 实测；macOS 15 + 微信 4.1.x 亦可用
 ---
 
 # Mac 微信防撤回
@@ -25,7 +25,7 @@ verified: macOS 26 + 微信 4.1.10 (build 268851) + Apple Silicon (M1 Pro) 实�
 
 | 方案 | 微信版本支持 | Apple Silicon | Intel | 活跃度 | 防撤回范围 | 安装难度 |
 |------|:----------:|:-----------:|:----:|:----:|:--------:|:------:|
-| **X1a0HeWeChatPlugin** | ✅ 4.1.9.x | ✅ ARM64 | ❌ | 🟢 活跃 (2026) | **全类型** | ⭐ |
+| **X1a0HeWeChatPlugin** | ✅ 4.1.15.x | ✅ ARM64 | ❌ | 🟢 活跃 (2026) | **全类型** | ⭐ |
 | **WeChatTweak-macOS** | ⚠️ ~4.0 | ✅ | ✅ | 🟡 较慢 | 基本覆盖 | ⭐⭐ |
 | WeChatIntercept | ⚠️ 3.7.x | ✅ | ✅ | 🔴 停更 | 基本覆盖 | ⭐⭐ |
 
@@ -38,23 +38,68 @@ verified: macOS 26 + 微信 4.1.10 (build 268851) + Apple Silicon (M1 Pro) 实�
 ### 项目信息
 
 - **GitHub**: [X1a0He/X1a0HeWeChatPlugin](https://github.com/X1a0He/X1a0HeWeChatPlugin)
-- **最新版本**: v2.3.1 (2026年4月)
+- **最新版本**: v2.10.0 (2026-09-19)
 - **支持架构**: Apple Silicon ARM64（不支持 Intel）
-- **微信兼容**: 4.0.x ~ 4.1.9.x
+- **微信兼容**: 4.0.x ~ 4.1.15.20(270100)
+
+> ⚠️ **仓库根目录已经没有 `install.sh` 了** —— 旧文档里的 `git clone && sudo sh install.sh` 已失效（照做只会报 `No such file or directory`）。当前仓库只有 `X1a0HeWeChatPlugin.pkg` 和 `X1a0HeWeChatPlugin.dylib` 两个产物，安装逻辑藏在 pkg 的 postinstall 里。
 
 ### 安装方式
 
-#### 一键安装（推荐）
+#### 方式 A：pkg 安装（官方路径）
 
 ```bash
-git clone https://github.com/X1a0He/X1a0HeWeChatPlugin.git
-cd X1a0HeWeChatPlugin
-sudo sh install.sh
+curl -L -o X1a0HeWeChatPlugin.pkg \
+  https://github.com/X1a0He/X1a0HeWeChatPlugin/releases/download/2.10.0/X1a0HeWeChatPlugin.pkg
+
+# 务必核对！校验值在 Release 说明里
+shasum -a 256 X1a0HeWeChatPlugin.pkg
+
+# pkg 的 PackageInfo 是 auth="root"，必须 root
+sudo installer -pkg X1a0HeWeChatPlugin.pkg -target /
 ```
 
-#### pkg 安装包
+> pkg **无签名**（`pkgutil --check-signature` 报 `no signature`），所以核对 SHA256 不是可选项。
 
-从 GitHub Releases 下载 `.pkg` 文件，双击安装（需要允许来自"任何来源"的应用）。
+#### 方式 B：不用 sudo，手工复刻 postinstall（推荐）
+
+`/Applications/WeChat.app` 通常归当前用户所有，patch + 重签**都不需要 root**。当 `sudo` 要密码、或不想让 root 碰 bundle（会把 `_CodeSignature/CodeResources` 变成 root 属主，之后无法正常重签）时，展开 pkg 手工执行：
+
+```bash
+pkgutil --expand-full X1a0HeWeChatPlugin.pkg /tmp/x1_pkg
+SRC=/tmp/x1_pkg/X1a0HeWeChatPlugin_component.pkg/Scripts
+W=/Applications/WeChat.app
+
+# 1) 退出微信，导出原始 entitlements（重签要用，必须一字不差）
+codesign -d --entitlements :- "$W/Contents/MacOS/WeChat" > /tmp/orig.plist
+
+# 2) 备份被改的两个文件 —— 主程序备份务必放 bundle 外！见下方踩坑 4
+cp "$W/Contents/Resources/wechat.dylib" "$W/Contents/Resources/wechat.dylib.original"
+cp -p "$W/Contents/MacOS/WeChat" /tmp/WeChat.x1a0he.original
+
+# 3) 拷插件 + 注入 load command
+cp "$SRC/X1a0HeWeChatPlugin.dylib" "$W/Contents/Frameworks/X1a0HeWeChatPlugin.dylib"
+"$SRC/insert_dylib" "$W/Contents/Frameworks/X1a0HeWeChatPlugin.dylib" \
+  /tmp/WeChat.x1a0he.original /tmp/WeChat.patched
+cp /tmp/WeChat.patched "$W/Contents/MacOS/WeChat"
+
+# 4) 重签：先嵌套载荷，再封 bundle（顺序不能反）
+codesign -f -s - --all-architectures "$W/Contents/Frameworks/X1a0HeWeChatPlugin.dylib"
+codesign -f -s - --all-architectures "$W/Contents/Resources/wechat.dylib"
+codesign -f -s - --entitlements /tmp/orig.plist --generate-entitlement-der "$W"
+
+# 5) 重置录屏授权后启动
+tccutil reset ScreenCapture com.tencent.xinWeChat
+open -a WeChat
+```
+
+#### 下载加速
+
+Release 资源会跳转到 `objects.githubusercontent.com`，国内常不通。两个替代：
+
+- **jsDelivr**（仓库内同名文件，国内可直连、不必挂代理）：
+  `https://cdn.jsdelivr.net/gh/X1a0He/X1a0HeWeChatPlugin@2.10.0/X1a0HeWeChatPlugin.pkg`
+- **代理**：节点需同时通 `github.com` 和 `objects.githubusercontent.com`（节点常挂，逐个测延迟）
 
 ### 功能清单
 
@@ -74,6 +119,73 @@ sudo sh install.sh
 - 微信 → 菜单栏 → 插件设置 → 开启/关闭各项功能
 - 防撤回开启后，对方撤回的消息会保留在聊天窗口并带有提示标记
 - 多开功能通过右键 Dock 图标 → 登录新账号 使用
+
+### X1a0He dylib 注入方案：路径、验证与踩坑（2026-09 实测）
+
+官方 postinstall 的真实行为（逐行读过 205 行脚本）：
+
+- 注入目标是**主程序** `Contents/MacOS/WeChat`（不是 wechat.dylib —— 这点和 naizhao 的字节补丁方案相反）
+- 插件落在 `Contents/Frameworks/X1a0HeWeChatPlugin.dylib`
+- 备份：`Contents/Resources/wechat.dylib.original` + `Contents/MacOS/WeChat.x1a0he.original`
+- 用 `insert_dylib` 加 load command，然后依次重签**插件 → wechat.dylib → 整个 bundle**，并在重签后**校验 entitlements 与原始一致**，不一致就中止
+- 最后自动 `tccutil reset ScreenCapture com.tencent.xinWeChat`
+
+**踩坑 4：主程序备份绝不能留在 bundle 内（会导致整包签名校验失败）**
+
+官方脚本把备份放在 `Contents/MacOS/WeChat.x1a0he.original`。问题在于 codesign 会把 `Contents/MacOS/` 下的 Mach-O 当**嵌套子组件**校验，而这个备份脱离了 bundle 上下文（`codesign -dv` 显示 `Info.plist=not bound`），单独校验必然失败：
+
+```
+$ codesign --verify /Applications/WeChat.app
+/Applications/WeChat.app: invalid Info.plist (plist or signature have been modified)
+In subcomponent: /Applications/WeChat.app/Contents/MacOS/WeChat.x1a0he.original
+```
+
+**后果**：整包 `--verify` 不通过，macOS 启动校验可能拒绝加载。**修法**：把备份移到 bundle 外（如 `~/tools/wechat-anti-recall/backup/`），再重签一次 bundle。移出后 `codesign --verify` 与 `--verify --deep` 均恢复 `valid on disk` / `satisfies its Designated Requirement`。
+
+> 注意 `Contents/Resources/wechat.dylib.original` 不受影响 —— Resources 不做嵌套代码扫描，只有 `MacOS/`、`Frameworks/`、`PlugIns/` 会。
+
+**验证安装（照这个来，别用旧的 framework 路径）**
+
+```bash
+W=/Applications/WeChat.app
+
+# 1) 注入是否成功：主程序应引用插件（会输出两条，x86_64/arm64 各一条）
+otool -L "$W/Contents/MacOS/WeChat" | grep -i x1a0he
+
+# 2) 签名与权限
+codesign --verify --deep --verbose=2 "$W"          # 期望 valid on disk
+codesign -d --entitlements :- "$W/Contents/MacOS/WeChat" > /tmp/after.plist
+cmp -s /tmp/orig.plist /tmp/after.plist && echo "✓ entitlements 未变"
+
+# 3) 最关键：插件是否真的被加载进进程（启动微信后再查）
+lsof -p "$(pgrep -x WeChat | head -1)" | grep -i X1a0HeWeChatPlugin
+```
+
+第 3 步是「字节在 ≠ 功能生效」里最硬的一环：**dylib 被映射进进程**才算真的注入成功。成功时还能看到插件自建的配置库被打开：
+
+```
+WeChat  <pid>  txt  REG  ...  /Applications/WeChat.app/Contents/Frameworks/X1a0HeWeChatPlugin.dylib
+WeChat  <pid>  7u   REG  ...  ~/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/X1a0HeWeChatPlugin/Configuration/plugin-config.sqlite
+```
+
+**检查防撤回开关是否真的打开**
+
+插件的开关存在它自己的 sqlite 里，可以直接读：
+
+```bash
+DB=~/Library/Containers/com.tencent.xinWeChat/Data/Library/Application\ Support/X1a0HeWeChatPlugin/Configuration/plugin-config.sqlite
+sqlite3 -header -column "$DB" "SELECT key, value FROM settings;"
+```
+
+关键项（默认值即为开启）：
+
+| key | 默认 | 含义 |
+|-----|:----:|------|
+| `X1a0HeWeChatPlugin_RevokeIntercept` | `true` | **防撤回总开关** |
+| `X1a0HeWeChatPlugin_InterceptOthersMsg` | `true` | 拦截他人消息 |
+| `X1a0HeWeChatPlugin_InterceptOthersOtherMsg` | `true` | 拦截他人其他类型消息 |
+| `X1a0HeWeChatPlugin_InterceptSelfMsg` | `false` | 拦截自己的消息（按需开） |
+| `X1a0HeWeChatPlugin_MultipleInstance` | `false` | 多开（保持关闭更安全） |
 
 ---
 
@@ -201,7 +313,7 @@ tccutil reset ScreenCapture com.tencent.xinWeChat
 
 | 方案 | SIP 要求 | 说明 |
 |------|:------:|------|
-| X1a0HeWeChatPlugin | 🟢 **通常不需要** | 安装脚本已做适配，大多数情况下无需关闭 SIP |
+| X1a0HeWeChatPlugin | 🟢 **不需要** | 2026-09 实测：SIP `enabled` 状态下注入 + 重签全程通过，无需关闭 SIP |
 | WeChatTweak-macOS | 🟡 **可能需要** | 部分 macOS 版本上 framework 注入会失败，需临时关闭 SIP |
 
 ### 如果遇到安装失败（framework 注入被阻止）
@@ -281,7 +393,7 @@ csrutil status
 
 1. **从官方 GitHub 下载**——永远不要使用来源不明的 .pkg 或 .dmg
 2. **查看 Star/Issue**——确认项目活跃、社区信任
-3. **代码审计**——如有能力，审查 install.sh 脚本内容
+3. **代码审计**——仓库已无 `install.sh`；用 `pkgutil --expand-full X1a0HeWeChatPlugin.pkg /tmp/x1_pkg` 展开后读 `Scripts/postinstall`（205 行，只做本地备份/注入/重签/TCC 重置，无任何网络请求）
 4. **安装完立即重启 SIP**——如果你临时关闭了它
 5. **大号慎用多开**——防撤回相对安全，多开有额外风控
 6. **禁用自动更新**——避免插件与新版本微信不兼容
@@ -324,14 +436,18 @@ csrutil status
 ### 第 4 步：验证安装
 
 ```bash
-# 检查 framework/plugin 是否存在
-ls /Applications/WeChat.app/Contents/MacOS/WeChatTweak.framework 2>/dev/null && echo "WeChatTweak installed" || echo "WeChatTweak not found"
+W=/Applications/WeChat.app
 
-# 或检查 X1a0He 的安装标记
-ls /Applications/WeChat.app/Contents/MacOS/WeChatPlugin.framework 2>/dev/null && echo "X1a0He installed" || echo "X1a0He not found"
+# X1a0He（dylib 注入）：插件在 Frameworks/ 而不是 MacOS/
+ls "$W/Contents/Frameworks/X1a0HeWeChatPlugin.dylib" && echo "X1a0He 已安装"
+# 真正说明问题的是这一步：插件是否被加载进进程
+lsof -p "$(pgrep -x WeChat | head -1)" | grep -i X1a0HeWeChatPlugin
+
+# WeChatTweak（framework 注入）
+ls "$W/Contents/MacOS/WeChatTweak.framework" 2>/dev/null && echo "WeChatTweak 已安装"
 
 # 字节补丁类（naizhao fork）：直接验补丁字节，比找文件可靠
-python3 scripts/check_patch.py "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' /Applications/WeChat.app/Contents/Info.plist)" 2>/dev/null
+python3 scripts/check_patch.py "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$W/Contents/Info.plist")" 2>/dev/null
 ```
 
 ### 第 5 步：提示用户
@@ -397,10 +513,19 @@ sudo xattr -d com.apple.quarantine /path/to/file
 
 ### 卸载插件
 
-**X1a0HeWeChatPlugin**：
+**X1a0HeWeChatPlugin**（仓库里同样**没有** `uninstall.sh`，手工还原）：
+
 ```bash
-sudo sh uninstall.sh
+W=/Applications/WeChat.app
+osascript -e 'quit app "WeChat"'
+# 还原主程序（备份放 bundle 外时，路径按你实际存放位置改）
+cp /path/to/WeChat.x1a0he.original "$W/Contents/MacOS/WeChat"
+rm -f "$W/Contents/Frameworks/X1a0HeWeChatPlugin.dylib"
+codesign -f -s - --entitlements /tmp/orig.plist --generate-entitlement-der "$W"
+tccutil reset ScreenCapture com.tencent.xinWeChat
 ```
+
+> 插件配置残留在 `~/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/X1a0HeWeChatPlugin/`，要彻底清掉可一并删除。
 
 **WeChatTweak-macOS**：
 ```bash
@@ -419,10 +544,13 @@ sudo rm -rf /Applications/WeChat.app/Contents/MacOS/WeChatTweak.framework
 
 | 微信版本 | X1a0HeWeChatPlugin | WeChatTweak-macOS | WeChatIntercept |
 |----------|:-----------------:|:-----------------:|:---------------:|
+| 4.1.15.x (270091~270100) | ✅ v2.10.0 | ❓ 未测试 | ❌ |
 | 4.1.9.x | ✅ v2.3.1 | ❓ 未测试 | ❌ |
 | 4.1.x | ✅ | ❓ 未测试 | ❌ |
 | 4.0.x | ✅ | ✅ v1.5.0 | ❌ |
 | 3.7.x ~ 3.9.x | ❌ | ✅ | ✅ |
 | 3.6.x 及更早 | ❌ | ⚠️ 部分 | ✅ |
+
+> X1a0He 每个版本只覆盖一小段 build 区间（如 v2.10.0 明写「兼容 4.1.15.11(270091) ~ 4.1.15.20(270100)」），**装前先对 build 号**（`/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' /Applications/WeChat.app/Contents/Info.plist`），不在区间内就等作者适配。
 
 > 4.1.x 上另有 **naizhao/WeChatTweak** fork（字节补丁方案，实测 4.1.10 / build 268851 可用）；「安装成功」别只看脚本提示，用 `scripts/check_patch.py` 验字节 + 一次真实撤回验功能。
