@@ -14,7 +14,7 @@ triggers:
   - wechat plugin
   - 微信插件
 platform: darwin
-verified: macOS 26 + 微信 4.1.10 (build 268851) + Apple Silicon (M1 Pro) 实测；macOS 15 + 微信 4.1.x 亦可用
+verified: macOS 26 + 微信 4.1.15.20 (270100) + X1a0HeWeChatPlugin 2.10.0 全流程实测 (2026-09-24)；字节补丁方案在 4.1.10.51 (268851) 实测
 ---
 
 # Mac 微信防撤回
@@ -25,7 +25,7 @@ verified: macOS 26 + 微信 4.1.10 (build 268851) + Apple Silicon (M1 Pro) 实�
 
 | 方案 | 微信版本支持 | Apple Silicon | Intel | 活跃度 | 防撤回范围 | 安装难度 |
 |------|:----------:|:-----------:|:----:|:----:|:--------:|:------:|
-| **X1a0HeWeChatPlugin** | ✅ 4.1.9.x | ✅ ARM64 | ❌ | 🟢 活跃 (2026) | **全类型** | ⭐ |
+| **X1a0HeWeChatPlugin** | ✅ 4.1.7~4.1.15（按 build 配对） | ✅ ARM64 | ❌ | 🟢 活跃 (2026-09) | **全类型** | ⭐ |
 | **WeChatTweak-macOS** | ⚠️ ~4.0 | ✅ | ✅ | 🟡 较慢 | 基本覆盖 | ⭐⭐ |
 | WeChatIntercept | ⚠️ 3.7.x | ✅ | ✅ | 🔴 停更 | 基本覆盖 | ⭐⭐ |
 
@@ -38,9 +38,9 @@ verified: macOS 26 + 微信 4.1.10 (build 268851) + Apple Silicon (M1 Pro) 实�
 ### 项目信息
 
 - **GitHub**: [X1a0He/X1a0HeWeChatPlugin](https://github.com/X1a0He/X1a0HeWeChatPlugin)
-- **最新版本**: v2.3.1 (2026年4月)
-- **支持架构**: Apple Silicon ARM64（不支持 Intel）
-- **微信兼容**: 4.0.x ~ 4.1.9.x
+- **最新版本**: v2.10.0 (2026-09-19)，⭐1500+，维护活跃
+- **支持架构**: Apple Silicon ARM64（❌ 不支持 Intel，❌ 不支持 App Store / MAS 版）
+- **微信兼容**: 4.1.7 ~ **4.1.15.20**，README 有 100+ 条「微信版本 ↔ build ↔ 需要的插件版本」对照表
 
 ### 安装方式
 
@@ -68,6 +68,56 @@ sudo sh install.sh
 | ✏️ **自定义撤回提示** | 修改撤回提示短语（如改为 "XXX 撤回了一条消息"） |
 | 🔍 **插件版本自检** | 自动检查插件是否有新版本 |
 
+### 安装要点与实测踩坑（2026-09-24，macOS 26 + 微信 4.1.15.20 + M1 Pro 实测）
+
+**① 版本必须配对（最容易踩的坑）**
+
+插件按**微信 build 号**打补丁，README 里有一张「微信版本 ↔ build ↔ 需要的插件版本」大表。注意**同一个版本号可能有多套 build**：实测机器上的 4.1.10.51 是 build `268851`，而表里的 4.1.10.51 是 `39907` —— 差一个数字就装不上。
+
+```bash
+# 先查自己的 build
+/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" /Applications/WeChat.app/Contents/Info.plist
+# 再去 README 表里搜这个数字；搜不到 = 需要先把微信升/降到表里支持的版本
+```
+
+表里每条都带官方 DMG 链接（`dldir1v6.qq.com`，国内 CDN，实测 ~0.7 MB/s），升级/降级直接用它。**新版微信的播放器已改成 `XPlayer.app` 且带 `LSUIElement=1`（4.1.15 起），不再需要任何 Dock 图标补丁**——老版本"裸二进制 wxplayer 抢 Dock 图标"的问题上游已修复。
+
+**② 装前做供应链校验（注入式插件，必须验）**
+
+pkg 本体**没有开发者签名**（`pkgutil --check-signature` 报 no signature，属正常现象），所以要用 README 公布的哈希自证：
+
+```bash
+shasum -a 256 ~/Downloads/X1a0HeWeChatPlugin.pkg     # 应等于 README 的「安装包 pkg SHA 256」
+pkgutil --expand ~/Downloads/X1a0HeWeChatPlugin.pkg /tmp/x1pkg
+shasum -a 256 /tmp/x1pkg/*_component.pkg/Scripts/X1a0HeWeChatPlugin.dylib   # 应等于 README 的 dylib SHA256
+```
+
+安装脚本（`postinstall`）实测审查结论：**无联网请求、无开机自启、无危险删除**；行为是「备份 `.original` → 校验 App Sandbox 权限 → `insert_dylib` 注入 `Contents/MacOS/WeChat` → 自动重签 → 支持重复安装时从备份还原」。
+
+**③ 装完必须重新封装 bundle（否则屏幕录制权限会反复失效）**
+
+安装器把 `WeChat.x1a0he.original`、`wechat.dylib.original` 备份留在 bundle 内，导致 `codesign --verify` 报 `invalid Info.plist / In subcomponent: …original`。封印失效 = macOS 每次重启重校验敏感权限签名 → **反复作废、反复弹「屏幕录制」授权**。所以装完补一条：
+
+```bash
+codesign --force --deep --sign - /Applications/WeChat.app
+codesign --verify --deep --strict /Applications/WeChat.app && echo OK
+tccutil reset ScreenCapture com.tencent.xinWeChat    # 之后回微信截一次图、重新授权
+```
+
+**④ 多开**
+
+插件自带多开（右键 Dock 图标）。若想保留原有分身的登录数据，仍可用「复制主 App + 改 Bundle ID」的老办法 —— 注入的插件会随字节一起复制过去，容器按 Bundle ID 走，登录数据不丢。
+
+**⑤ 验证防撤回真的生效**
+
+插件加载 ≠ 功能生效。可从进程确认插件已加载：
+
+```bash
+lsof -p "$(pgrep -f 'Contents/MacOS/WeChat$')" | grep X1a0He
+```
+
+功能层面仍需一次真实撤回事件验证（最省事：小号发消息 → 撤回 → 看主号窗口是否保留）。
+
 ### 使用说明
 
 安装后，插件会在微信菜单栏添加设置入口：
@@ -86,7 +136,7 @@ sudo sh install.sh
 - **支持架构**: Apple Silicon + Intel（通用）
 - **微信兼容**: ≤ 4.0.x（4.1 以上未经充分测试）
 
-> **4.1+ 用户请看这里**：上游停在 ≤ 4.0 已久，4.1 及以上请用社区维护的 fork [naizhao/WeChatTweak](https://github.com/naizhao/WeChatTweak)（持续更新 config.json 里的字节补丁偏移）。它是**字节补丁**而非 dylib 注入，原理、验证方法与实测踩坑见下文「字节补丁方案实操与踩坑」。
+> **4.1+ 用户注意**：优先用方案一（X1a0HeWeChatPlugin，活跃维护、功能最全）。只有当你的微信 **build 不在它的支持表里**时，才用社区维护的 fork [naizhao/WeChatTweak](https://github.com/naizhao/WeChatTweak) 兜底 —— 它是**字节补丁**而非 dylib 注入，原理、验证方法与踩坑见下文「字节补丁方案实操与踩坑」。本 skill 已于 2026-09-24 在 macOS 26 + 微信 4.1.15.20 上实测方案一全流程。
 
 ### 安装方式
 
@@ -370,6 +420,14 @@ tccutil reset ScreenCapture com.tencent.xinWeChat
 1. 字节补丁类方案先验字节：`python3 scripts/check_patch.py <CFBundleVersion>`，两处都 `✅ 补丁在`
 2. 再验功能，最省事的是**双开自测**：小号发一条消息给主号 → 小号撤回 → 看主号窗口里那条是否还在（还在 = 生效）
 3. 「字节在」不等于「功能生效」—— 别只看安装脚本打印的成功提示
+
+### 插件装不上 / 提示版本不支持
+
+插件按微信 **build 号**匹配（不是版本号）。先查 `CFBundleVersion`，再去插件 README 的支持表里搜 —— 搜不到就用表里对应版本的官方 DMG 升级/降级微信，或改用 naizhao fork 的字节补丁方案（见上文）。
+
+### 装完 X1a0He 插件后，微信截图提示「没有权限」
+
+安装器留在 bundle 内的 `.original` 备份会让签名封印失效 —— 这正是权限被反复作废的根因。两条一起做：① `codesign --force --deep --sign - /Applications/WeChat.app` 重封 bundle；② `tccutil reset ScreenCapture com.tencent.xinWeChat` 后回微信截一次图、在弹框里点允许。
 
 ### 微信更新后插件失效
 
