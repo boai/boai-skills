@@ -1,5 +1,6 @@
 # 🧰 boai skills
 
+[![version](https://img.shields.io/badge/version-1.6.0-blue.svg)](#版本)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows-blue.svg)](#)
 [![Platform: macOS](https://img.shields.io/badge/Platform-macOS-silver.svg)](#)
@@ -32,7 +33,7 @@
 /plugin install boai-skills@boai-skills
 ```
 
-或只装某一个：
+按技能名安装（任装一个都会得到全部技能 —— 这些条目指向同一份清单，版本号也共用同一个）：
 
 | 技能 | 安装命令 |
 |------|----------|
@@ -88,13 +89,68 @@
 | 💬 **mac-wechat-dual-instance** | 微信双开/多开，无需禁SIP，原生Apple Silicon | `微信双开` `微信分身` `wechat dual` |
 | 🔒 **mac-wechat-anti-recall** | 微信防撤回，全消息类型支持，附带去日志/去更新 | `微信防撤回` `anti recall` `anti revoke` |
 
+## 版本
+
+**对外只有一个版本号**（下面的「对外发布版本」）——由仓库根的 `.claude-plugin/plugin.json` 决定，也是驱动自动更新的唯一依据。各技能的版本号属于**内部记录**，不影响用户看到或拿到的版本。
+
+> 为什么不做「每个技能一个版本」？官方规则里 marketplace 条目的 `version` 会被 `plugin.json` **静默覆盖**（`claude plugin validate` 会警告），而本仓库所有技能条目都指向同一份清单 —— 一个市场同一时刻只对外提供一个版本。
+
+<!-- versions:start -->
+
+**对外发布版本：`1.6.0`** — 用户安装/更新时看到的版本，也是驱动更新的唯一版本号。
+整包与 8 个技能条目共用它；发版时改它，用户下次自动收到更新。
+
+独立插件（拥有自己的 `plugin.json`，版本独立生效）：
+
+| 插件 | 版本 |
+| --- | --- |
+| `claude-token-tracker` | 1.0.0 |
+
+各技能内部版本（仅记录该技能自身迭代，**不影响用户看到的版本**）：
+
+| 技能 | 内部版本 |
+| --- | --- |
+| `360-cleaner` | 1.0.0 |
+| `boai-article-writer` | 2.3.0 |
+| `boai-city-food` | 1.0.0 |
+| `boai-film-review` | 2.4.0 |
+| `boai-travel-guide` | 1.0.0 |
+| `mac-wechat-anti-recall` | 1.0.0 |
+| `mac-wechat-dual-instance` | 1.0.0 |
+| `sogou-ad-killer` | 1.0.0 |
+
+<!-- versions:end -->
+
+**递增规则**
+
+| 改动 | 版本动作 | 例子 |
+|------|----------|------|
+| 新增技能、大改流程 | minor +1 | 1.6.0 → 1.7.0 |
+| 修 bug、补细节 | patch +1 | 1.7.0 → 1.7.1 |
+| 破坏性变更（改目录/触发词不兼容） | major +1 | 1.7.1 → 2.0.0 |
+
+**改版本号（别手工改，用脚本）**
+
+```bash
+./scripts/bump-version.sh list                                  # 查看所有版本
+./scripts/bump-version.sh release 1.7.0                         # 发版：改对外版本并同步 README
+./scripts/bump-version.sh skill mac-wechat-anti-recall 1.0.1     # 记一次内部技能版本（对外不变）
+./scripts/bump-version.sh plugin claude-token-tracker 1.1.0      # 独立插件自己的版本
+./scripts/bump-version.sh sync                                  # README 版本区与源头不一致时，补一次
+```
+
+两个要点：
+
+- **`release` 是唯一让用户拿到新版本的动作** —— 它改 `plugin.json` 的 version（Claude Code 用这个值判断要不要更新）。只 push 代码不改 version，用户会一直停在旧版本。
+- **`skill` 只动内部记录**，用户完全无感。
+
 ## 目录结构
 
 ```plaintext
 boai-skills/
 ├── .claude-plugin/
 │   ├── marketplace.json      # 市场清单：整包 + 各技能/插件可单独安装
-│   └── plugin.json           # 整包 plugin 清单（7 个触发式技能）
+│   └── plugin.json           # 整包 plugin 清单（8 个触发式技能）· **对外版本号在这里**
 ├── plugins/
 │   └── claude-token-tracker/ # 自动 token 统计（Stop hook 插件）
 │       ├── .claude-plugin/plugin.json
@@ -111,8 +167,9 @@ boai-skills/
 │   ├── 360-cleaner/SKILL.md
 │   ├── mac-wechat-dual-instance/SKILL.md
 │   └── mac-wechat-anti-recall/SKILL.md
-├── scripts/                  # Windows 脚本等
-│   └── sogou_ad_killer.ps1
+├── scripts/                  # 维护脚本
+│   ├── sogou_ad_killer.ps1          # 搜狗去广告（Windows PowerShell）
+│   └── bump-version.sh              # 版本号工具（发版 / 内部技能版本 / README 同步）
 ├── README.md
 └── LICENSE
 ```

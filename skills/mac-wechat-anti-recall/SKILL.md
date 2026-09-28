@@ -1,6 +1,7 @@
 ---
 name: mac-wechat-anti-recall
 description: 防止 Mac 微信消息被撤回，支持文字/图片/视频/语音/表情/文件/小程序/拍一拍等全部消息类型，同时提供多开和禁用更新功能。支持微信 4.x 最新版，Apple Silicon 和 Intel
+version: 1.0.0
 triggers:
   - 微信防撤回
   - 防撤回
