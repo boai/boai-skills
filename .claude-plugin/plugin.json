@@ -1,7 +1,7 @@
 {
   "name": "boai-skills",
-  "version": "1.6.0",
-  "description": "boai 的 Claude Code 技能合集——公众号文章/影评/旅游攻略、搜狗广告清理、Windows 系统工具、Mac 微信双开/防撤回等实用技能，持续更新（token 用量统计见独立插件 claude-token-tracker）",
+  "version": "1.7.0",
+  "description": "boai 的 Claude Code 技能合集——公众号文章/影评/旅游攻略、研发与测试提效（代码评审/提测/回归/用例/接口转模型）、搜狗广告清理、Windows 系统工具、Mac 微信双开/防撤回等实用技能，持续更新（token 用量统计见独立插件 claude-token-tracker）",
   "author": {
     "name": "博爱 (boai)",
     "url": "https://github.com/boai"
@@ -9,7 +9,37 @@
   "homepage": "https://github.com/boai/boai-skills",
   "repository": "https://github.com/boai/boai-skills",
   "license": "MIT",
-  "keywords": ["claude-code", "plugin", "windows", "macos", "sogou", "ad-blocker", "input-method", "privacy", "debloat", "boai", "chinese", "wechat", "anti-recall", "multi-instance", "security", "travel", "guide", "itinerary", "film-review"],
+  "keywords": [
+    "claude-code",
+    "plugin",
+    "windows",
+    "macos",
+    "sogou",
+    "ad-blocker",
+    "input-method",
+    "privacy",
+    "debloat",
+    "boai",
+    "chinese",
+    "wechat",
+    "anti-recall",
+    "multi-instance",
+    "security",
+    "travel",
+    "guide",
+    "itinerary",
+    "film-review",
+    "code-review",
+    "qa",
+    "testing",
+    "regression",
+    "testcases",
+    "swift",
+    "ios",
+    "openapi",
+    "mock",
+    "developer-tools"
+  ],
   "skills": [
     "./skills/boai-article-writer",
     "./skills/boai-film-review",
@@ -18,6 +48,11 @@
     "./skills/sogou-ad-killer",
     "./skills/360-cleaner",
     "./skills/mac-wechat-dual-instance",
-    "./skills/mac-wechat-anti-recall"
+    "./skills/mac-wechat-anti-recall",
+    "./skills/code-review-report",
+    "./skills/qa-release-note",
+    "./skills/regression-checklist",
+    "./skills/prd-to-testcases",
+    "./skills/api-to-swift-model"
   ]
 }

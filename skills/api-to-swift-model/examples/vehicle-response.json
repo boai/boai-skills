@@ -1,0 +1,29 @@
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "vehicle_id": "VH10086",
+    "vehicle_name": "我的爱车",
+    "plate_number": "粤A·00000",
+    "is_online": true,
+    "battery_level": 86,
+    "range_km": 412.5,
+    "owner": {
+      "user_id": "U1001",
+      "nick_name": "张三",
+      "phone": null
+    },
+    "climate": {
+      "is_on": false,
+      "temperature": 24,
+      "supported_modes": ["cool", "heat", "auto"]
+    },
+    "last_trip": {
+      "start_time": "2026-11-10T08:30:00Z",
+      "distance_km": 23.6,
+      "avg_speed": 38.2
+    },
+    "tags": ["家用", "通勤"],
+    "warnings": []
+  }
+}

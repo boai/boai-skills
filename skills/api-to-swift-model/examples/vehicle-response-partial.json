@@ -1,0 +1,23 @@
+{
+  "code": 0,
+  "message": "ok",
+  "data": {
+    "vehicle_id": "VH10087",
+    "vehicle_name": "家里的车",
+    "plate_number": "粤B·11111",
+    "is_online": false,
+    "battery_level": 12,
+    "owner": {
+      "user_id": "U1002",
+      "nick_name": "张三",
+      "phone": "13800000000"
+    },
+    "climate": {
+      "is_on": true,
+      "temperature": 28,
+      "supported_modes": ["auto"]
+    },
+    "tags": [],
+    "warnings": ["电量低"]
+  }
+}

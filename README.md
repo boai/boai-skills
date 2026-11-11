@@ -1,6 +1,6 @@
 # 🧰 boai skills
 
-[![version](https://img.shields.io/badge/version-1.6.0-blue.svg)](#版本)
+[![version](https://img.shields.io/badge/version-1.7.0-blue.svg)](#版本)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows-blue.svg)](#)
 [![Platform: macOS](https://img.shields.io/badge/Platform-macOS-silver.svg)](#)
@@ -45,6 +45,11 @@
 | 🔧 360-cleaner | `/plugin install 360-cleaner@boai-skills` |
 | 💬 mac-wechat-dual-instance | `/plugin install mac-wechat-dual-instance@boai-skills` |
 | 🔒 mac-wechat-anti-recall | `/plugin install mac-wechat-anti-recall@boai-skills` |
+| 🔍 code-review-report | `/plugin install code-review-report@boai-skills` |
+| 📋 qa-release-note | `/plugin install qa-release-note@boai-skills` |
+| ✅ regression-checklist | `/plugin install regression-checklist@boai-skills` |
+| 🧪 prd-to-testcases | `/plugin install prd-to-testcases@boai-skills` |
+| 🧩 api-to-swift-model | `/plugin install api-to-swift-model@boai-skills` |
 
 装完执行 `/reload-plugins` 让当前会话立即生效（或重启 Claude Code）。要卸载或管理已装插件，打开 `/plugin` 面板即可。
 
@@ -75,6 +80,16 @@
 |------|------|--------|
 | 🍜 **boai-city-food** | 一句话搜一座城市最好吃的美食：按区域整理，星级推荐 + 店名/地址/菜价/人均，PDF 交付 | `美食推荐` `有什么好吃的` `必吃` `探店` |
 
+### 🛠 研发 / 测试（技能，提到触发词时启用）
+
+| 技能 | 说明 | 触发词 |
+|------|------|--------|
+| 🔍 **code-review-report** | 代码评审报告生成器：分支差异/粘贴代码 → 按阻断/严重/建议/好评分级，带可校验的文件行号 | `代码评审` `code review` `评审这个分支` `合并前检查` |
+| 📋 **qa-release-note** | 提测说明生成器：Git 提交 → 测试可直接执行的提测单，含改动清单/影响面/测试重点/回滚方案 | `提测` `提测说明` `提测单` `发版说明` |
+| ✅ **regression-checklist** | 回归测试清单生成器：改动文件 + 模块地图 → P0-P2 优先级、验证步骤和结果列的 Excel 清单 | `回归测试` `回归清单` `影响范围` `要回归什么` |
+| 🧪 **prd-to-testcases** | 需求文档转测试用例：PRD → 正常/异常/边界/权限/兼容五类用例 + 覆盖矩阵 + 待确认问题 | `测试用例` `需求转用例` `PRD 拆用例` `用例覆盖` |
+| 🧩 **api-to-swift-model** | 接口文档转 Swift 模型：OpenAPI/Swagger 或 JSON 样本 → Codable + Mock + 请求骨架 + 编译校验 | `接口转模型` `JSON 转 Swift` `生成 Codable` `OpenAPI` `Mock` |
+
 ### 🪟 Windows
 
 | 技能 | 说明 | 触发词 |
@@ -97,8 +112,8 @@
 
 <!-- versions:start -->
 
-**对外发布版本：`1.6.0`** — 用户安装/更新时看到的版本，也是驱动更新的唯一版本号。
-整包与 8 个技能条目共用它；发版时改它，用户下次自动收到更新。
+**对外发布版本：`1.7.0`** — 用户安装/更新时看到的版本，也是驱动更新的唯一版本号。
+整包与全部技能条目共用它；发版时改它，用户下次自动收到更新。
 
 独立插件（拥有自己的 `plugin.json`，版本独立生效）：
 
@@ -111,12 +126,17 @@
 | 技能 | 内部版本 |
 | --- | --- |
 | `360-cleaner` | 1.0.0 |
+| `api-to-swift-model` | 1.0.0 |
 | `boai-article-writer` | 2.3.0 |
 | `boai-city-food` | 1.0.0 |
 | `boai-film-review` | 2.4.0 |
 | `boai-travel-guide` | 1.0.0 |
+| `code-review-report` | 1.0.0 |
 | `mac-wechat-anti-recall` | 1.0.0 |
 | `mac-wechat-dual-instance` | 1.0.0 |
+| `prd-to-testcases` | 1.0.0 |
+| `qa-release-note` | 1.0.0 |
+| `regression-checklist` | 1.0.0 |
 | `sogou-ad-killer` | 1.0.0 |
 
 <!-- versions:end -->
@@ -150,7 +170,7 @@
 boai-skills/
 ├── .claude-plugin/
 │   ├── marketplace.json      # 市场清单：整包 + 各技能/插件可单独安装
-│   └── plugin.json           # 整包 plugin 清单（8 个触发式技能）· **对外版本号在这里**
+│   └── plugin.json           # 整包 plugin 清单（13 个触发式技能）· **对外版本号在这里**
 ├── plugins/
 │   └── claude-token-tracker/ # 自动 token 统计（Stop hook 插件）
 │       ├── .claude-plugin/plugin.json
@@ -166,7 +186,12 @@ boai-skills/
 │   ├── sogou-ad-killer/SKILL.md
 │   ├── 360-cleaner/SKILL.md
 │   ├── mac-wechat-dual-instance/SKILL.md
-│   └── mac-wechat-anti-recall/SKILL.md
+│   ├── mac-wechat-anti-recall/SKILL.md
+│   ├── code-review-report/          # 代码评审报告（脚本/检查清单/示例）
+│   ├── qa-release-note/             # 提测说明生成
+│   ├── regression-checklist/        # 回归测试清单（模块地图 + Excel）
+│   ├── prd-to-testcases/            # 需求转测试用例
+│   └── api-to-swift-model/          # 接口转 Swift 模型
 ├── scripts/                  # 维护脚本
 │   ├── sogou_ad_killer.ps1          # 搜狗去广告（Windows PowerShell）
 │   └── bump-version.sh              # 版本号工具（发版 / 内部技能版本 / README 同步）

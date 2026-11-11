@@ -18,9 +18,13 @@
         "wechat",
         "token",
         "travel",
-        "boai"
+        "boai",
+        "code-review",
+        "qa",
+        "testing",
+        "swift"
       ],
-      "description": "全部技能一键安装（token 统计 / 文章撰写 / 影评 / 旅游攻略 / 城市美食 / 搜狗去广告 / 360 清理 / 微信双开 / 微信防撤回）"
+      "description": "全部技能一键安装（token 统计 / 文章撰写 / 影评 / 旅游攻略 / 城市美食 / 代码评审 / 提测说明 / 回归清单 / 需求转用例 / 接口转模型 / 搜狗去广告 / 360 清理 / 微信双开 / 微信防撤回）"
     },
     {
       "name": "claude-token-tracker",
@@ -66,6 +70,62 @@
       "name": "mac-wechat-anti-recall",
       "source": "./",
       "description": "macOS 微信防撤回，全消息类型支持，附带去日志/去更新"
+    },
+    {
+      "name": "code-review-report",
+      "source": "./",
+      "category": "development",
+      "tags": [
+        "code-review",
+        "git",
+        "quality"
+      ],
+      "description": "代码评审报告生成器：读取分支差异或粘贴代码，按阻断/严重/建议/好评分级生成带可校验行号的评审报告"
+    },
+    {
+      "name": "qa-release-note",
+      "source": "./",
+      "category": "development",
+      "tags": [
+        "qa",
+        "release",
+        "git"
+      ],
+      "description": "提测说明生成器：从 Git 提交自动生成测试可直接执行的提测单，含改动清单/影响面/测试重点/回滚方案"
+    },
+    {
+      "name": "regression-checklist",
+      "source": "./",
+      "category": "development",
+      "tags": [
+        "testing",
+        "regression",
+        "excel"
+      ],
+      "description": "回归测试清单生成器：改动文件 + 模块地图 → 带 P0-P2 优先级和验证步骤的 Excel 回归清单"
+    },
+    {
+      "name": "prd-to-testcases",
+      "source": "./",
+      "category": "development",
+      "tags": [
+        "testing",
+        "prd",
+        "testcases"
+      ],
+      "description": "需求文档转测试用例：PRD → 正常/异常/边界/权限/兼容五类用例 + 覆盖矩阵 + 待确认问题"
+    },
+    {
+      "name": "api-to-swift-model",
+      "source": "./",
+      "category": "development",
+      "tags": [
+        "swift",
+        "ios",
+        "openapi",
+        "mock"
+      ],
+      "description": "接口文档转 Swift 模型：OpenAPI/Swagger 或 JSON 样本 → Codable 模型 + Mock + 请求骨架 + 编译校验"
     }
   ]
 }

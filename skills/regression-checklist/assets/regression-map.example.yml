@@ -1,0 +1,51 @@
+# 模块地图示例（复制到项目根目录并改名为 .regression-map.yml）
+#
+# 作用：把「改动文件」映射到「业务模块」，回归清单据此生成。
+# 原则：用目录前缀或 glob，不要逐个文件列；priority 按业务重要性定。
+
+project: DemoCarApp
+
+modules:
+  - name: 车辆列表
+    paths:
+      - "Sources/Vehicle/VehicleListViewController.swift"
+      - "Sources/Vehicle/List/**"
+    priority: P0
+    test_steps:
+      - 打开 App，进入「我的车辆」
+      - 检查列表加载、下拉刷新、空列表展示
+
+  - name: 远程空调
+    paths:
+      - "Sources/Vehicle/RemoteClimateService.swift"
+      - "Sources/Vehicle/Climate/**"
+    priority: P0
+    test_steps:
+      - 选择一辆车，点击「远程开空调」
+      - 检查温度参数、成功提示、失败提示
+
+  - name: 车门控制
+    paths:
+      - "Sources/Vehicle/DoorService.swift"
+      - "Sources/Vehicle/Door/**"
+    priority: P0
+    test_steps:
+      - 点击「解锁车门」，检查成功与失败提示
+      - 检查登录态失效时的表现
+
+  - name: 网络层
+    paths:
+      - "Sources/Network/**"
+    priority: P1
+    test_steps:
+      - 断开网络后重试
+      - 模拟接口返回非法 JSON
+      - 模拟接口超时
+
+  - name: 多语言
+    paths:
+      - "Resources/**"
+    priority: P2
+    test_steps:
+      - 切换语言后检查文案
+      - 检查长文案是否截断
