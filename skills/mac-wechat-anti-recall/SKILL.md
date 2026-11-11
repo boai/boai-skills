@@ -1,6 +1,7 @@
 ---
 name: mac-wechat-anti-recall
 description: 防止 Mac 微信消息被撤回，支持文字/图片/视频/语音/表情/文件/小程序/拍一拍等全部消息类型，同时提供多开和禁用更新功能。支持微信 4.x 最新版，Apple Silicon 和 Intel
+version: 1.0.0
 triggers:
   - 微信防撤回
   - 防撤回
@@ -14,7 +15,7 @@ triggers:
   - wechat plugin
   - 微信插件
 platform: darwin
-verified: macOS 27 + 微信 4.1.15 (build 270100) + Apple Silicon 实测（X1a0HeWeChatPlugin v2.10.0，2026-09）；macOS 26 + 微信 4.1.10 (build 268851) 实测；macOS 15 + 微信 4.1.x 亦可用
+verified: macOS 27 + 微信 4.1.15 (build 270100) + Apple Silicon 实测（X1a0HeWeChatPlugin v2.10.0）；macOS 26 + 微信 4.1.15.20 (270100) 全流程实测 (2026-09-24)；字节补丁方案在 4.1.10.51 (268851) 实测；macOS 15 + 微信 4.1.x 亦可用
 ---
 
 # Mac 微信防撤回
@@ -25,7 +26,7 @@ verified: macOS 27 + 微信 4.1.15 (build 270100) + Apple Silicon 实测（X1a0H
 
 | 方案 | 微信版本支持 | Apple Silicon | Intel | 活跃度 | 防撤回范围 | 安装难度 |
 |------|:----------:|:-----------:|:----:|:----:|:--------:|:------:|
-| **X1a0HeWeChatPlugin** | ✅ 4.1.15.x | ✅ ARM64 | ❌ | 🟢 活跃 (2026) | **全类型** | ⭐ |
+| **X1a0HeWeChatPlugin** | ✅ 4.1.7~4.1.15（按 build 配对） | ✅ ARM64 | ❌ | 🟢 活跃 (2026-09) | **全类型** | ⭐ |
 | **WeChatTweak-macOS** | ⚠️ ~4.0 | ✅ | ✅ | 🟡 较慢 | 基本覆盖 | ⭐⭐ |
 | WeChatIntercept | ⚠️ 3.7.x | ✅ | ✅ | 🔴 停更 | 基本覆盖 | ⭐⭐ |
 
@@ -38,9 +39,9 @@ verified: macOS 27 + 微信 4.1.15 (build 270100) + Apple Silicon 实测（X1a0H
 ### 项目信息
 
 - **GitHub**: [X1a0He/X1a0HeWeChatPlugin](https://github.com/X1a0He/X1a0HeWeChatPlugin)
-- **最新版本**: v2.10.0 (2026-09-19)
-- **支持架构**: Apple Silicon ARM64（不支持 Intel）
-- **微信兼容**: 4.0.x ~ 4.1.15.20(270100)
+- **最新版本**: v2.10.0 (2026-09-19)，⭐1500+，维护活跃
+- **支持架构**: Apple Silicon ARM64（❌ 不支持 Intel，❌ 不支持 App Store / MAS 版）
+- **微信兼容**: 4.1.7 ~ **4.1.15.20**（按 build 配对）；README 有 100+ 条「微信版本 ↔ build ↔ 需要的插件版本」对照表
 
 > ⚠️ **仓库根目录已经没有 `install.sh` 了** —— 旧文档里的 `git clone && sudo sh install.sh` 已失效（照做只会报 `No such file or directory`）。当前仓库只有 `X1a0HeWeChatPlugin.pkg` 和 `X1a0HeWeChatPlugin.dylib` 两个产物，安装逻辑藏在 pkg 的 postinstall 里。
 
@@ -52,7 +53,7 @@ verified: macOS 27 + 微信 4.1.15 (build 270100) + Apple Silicon 实测（X1a0H
 curl -L -o X1a0HeWeChatPlugin.pkg \
   https://github.com/X1a0He/X1a0HeWeChatPlugin/releases/download/2.10.0/X1a0HeWeChatPlugin.pkg
 
-# 务必核对！校验值在 Release 说明里
+# 务必核对！哈希在 README（「安装包 pkg SHA 256」）
 shasum -a 256 X1a0HeWeChatPlugin.pkg
 
 # pkg 的 PackageInfo 是 auth="root"，必须 root
@@ -120,9 +121,33 @@ Release 资源会跳转到 `objects.githubusercontent.com`，国内常不通。�
 - 防撤回开启后，对方撤回的消息会保留在聊天窗口并带有提示标记
 - 多开功能通过右键 Dock 图标 → 登录新账号 使用
 
-### X1a0He dylib 注入方案：路径、验证与踩坑（2026-09 实测）
+### X1a0He 方案：版本配对、注入原理与验证（2026-09 实测）
 
-官方 postinstall 的真实行为（逐行读过 205 行脚本）：
+**① 版本必须配对（最容易踩的坑）**
+
+插件按**微信 build 号**打补丁，不是按版本号。README 里有一张「微信版本 ↔ build ↔ 需要的插件版本」大表（100+ 条）。注意**同一个版本号可能有多套 build**：实测机器上的 4.1.10.51 是 build `268851`，而表里的 4.1.10.51 是 `39907` —— 差一个数字就装不上。
+
+```bash
+# 先查自己的 build
+/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" /Applications/WeChat.app/Contents/Info.plist
+# 再去 README 表里搜这个数字；搜不到 = 需要先把微信升/降到表里支持的版本
+```
+
+表里每条都带官方 DMG 链接（`dldir1v6.qq.com`，国内 CDN，实测 ~0.7 MB/s），升级/降级直接用它。**新版微信的播放器已改成 `XPlayer.app` 且带 `LSUIElement=1`（4.1.15 起），不再需要任何 Dock 图标补丁** —— 老版本"裸二进制 wxplayer 抢 Dock 图标"的问题上游已修复。
+
+**② 供应链校验（注入式插件，必须验）**
+
+pkg 本体**没有开发者签名**（`pkgutil --check-signature` 报 no signature，属正常现象），所以要用 README 公布的哈希自证：
+
+```bash
+shasum -a 256 X1a0HeWeChatPlugin.pkg     # 应等于 README 的「安装包 pkg SHA 256」
+pkgutil --expand X1a0HeWeChatPlugin.pkg /tmp/x1pkg
+shasum -a 256 /tmp/x1pkg/*_component.pkg/Scripts/X1a0HeWeChatPlugin.dylib   # 应等于 README 的 dylib SHA256
+```
+
+安装脚本（`postinstall`，205 行）实测审查结论：**无联网请求、无开机自启、无危险删除**；行为是「备份 `.original` → 校验 App Sandbox 权限 → `insert_dylib` 注入 `Contents/MacOS/WeChat` → 自动重签 → 支持重复安装时从备份还原」。
+
+**官方 postinstall 的真实行为（逐行读过 205 行脚本）**
 
 - 注入目标是**主程序** `Contents/MacOS/WeChat`（不是 wechat.dylib —— 这点和 naizhao 的字节补丁方案相反）
 - 插件落在 `Contents/Frameworks/X1a0HeWeChatPlugin.dylib`
@@ -140,7 +165,9 @@ $ codesign --verify /Applications/WeChat.app
 In subcomponent: /Applications/WeChat.app/Contents/MacOS/WeChat.x1a0he.original
 ```
 
-**后果**：整包 `--verify` 不通过，macOS 启动校验可能拒绝加载。**修法**：把备份移到 bundle 外（如 `~/tools/wechat-anti-recall/backup/`），再重签一次 bundle。移出后 `codesign --verify` 与 `--verify --deep` 均恢复 `valid on disk` / `satisfies its Designated Requirement`。
+**后果**：整包 `--verify` 不通过，macOS 启动校验可能拒绝加载；签名封印失效还会让 macOS 每次重启重校验敏感权限签名 → **屏幕录制授权反复作废、反复弹框**。**修法**：把备份移到 bundle 外（如 `~/tools/wechat-anti-recall/backup/`），再重签一次 bundle。移出后 `codesign --verify` 与 `--verify --deep` 均恢复 `valid on disk` / `satisfies its Designated Requirement`。
+
+如果已经用 pkg 装完才发现，可以先应急补一次 `codesign --force --deep --sign - /Applications/WeChat.app` + `tccutil reset ScreenCapture com.tencent.xinWeChat`；但更彻底的做法还是把备份移出 bundle 再重签 —— 这样 `--verify --deep` 不会再扫描到 `Contents/MacOS/` 下的 `.original`。
 
 > 注意 `Contents/Resources/wechat.dylib.original` 不受影响 —— Resources 不做嵌套代码扫描，只有 `MacOS/`、`Frameworks/`、`PlugIns/` 会。
 
@@ -168,6 +195,8 @@ WeChat  <pid>  txt  REG  ...  /Applications/WeChat.app/Contents/Frameworks/X1a0H
 WeChat  <pid>  7u   REG  ...  ~/Library/Containers/com.tencent.xinWeChat/Data/Library/Application Support/X1a0HeWeChatPlugin/Configuration/plugin-config.sqlite
 ```
 
+功能层面仍需一次真实撤回事件验证（最省事：小号发消息 → 撤回 → 看主号窗口是否保留）。
+
 **检查防撤回开关是否真的打开**
 
 插件的开关存在它自己的 sqlite 里，可以直接读：
@@ -187,6 +216,10 @@ sqlite3 -header -column "$DB" "SELECT key, value FROM settings;"
 | `X1a0HeWeChatPlugin_InterceptSelfMsg` | `false` | 拦截自己的消息（按需开） |
 | `X1a0HeWeChatPlugin_MultipleInstance` | `false` | 多开（保持关闭更安全） |
 
+**多开**
+
+插件自带多开（右键 Dock 图标）。若想保留原有分身的登录数据，仍可用「复制主 App + 改 Bundle ID」的老办法 —— 注入的插件会随字节一起复制过去，容器按 Bundle ID 走，登录数据不丢。
+
 ---
 
 ## 方案二：WeChatTweak-macOS（经典方案，Intel 可用）
@@ -198,7 +231,7 @@ sqlite3 -header -column "$DB" "SELECT key, value FROM settings;"
 - **支持架构**: Apple Silicon + Intel（通用）
 - **微信兼容**: ≤ 4.0.x（4.1 以上未经充分测试）
 
-> **4.1+ 用户请看这里**：上游停在 ≤ 4.0 已久，4.1 及以上请用社区维护的 fork [naizhao/WeChatTweak](https://github.com/naizhao/WeChatTweak)（持续更新 config.json 里的字节补丁偏移）。它是**字节补丁**而非 dylib 注入，原理、验证方法与实测踩坑见下文「字节补丁方案实操与踩坑」。
+> **4.1+ 用户注意**：优先用方案一（X1a0HeWeChatPlugin，活跃维护、功能最全）。只有当你的微信 **build 不在它的支持表里**时，才用社区维护的 fork [naizhao/WeChatTweak](https://github.com/naizhao/WeChatTweak) 兜底 —— 它是**字节补丁**而非 dylib 注入，原理、验证方法与踩坑见下文「字节补丁方案实操与踩坑」。本 skill 已于 2026-09-24 在 macOS 26 + 微信 4.1.15.20 上实测方案一全流程。
 
 ### 安装方式
 
@@ -479,13 +512,17 @@ tccutil reset ScreenCapture com.tencent.xinWeChat
 # 回微信截一次图 → 弹框 → 允许
 ```
 
-详见上文「字节补丁方案实操与踩坑」第 2 条。
+详见上文「字节补丁方案实操与踩坑」第 2 条。X1a0He 方案还有一个专属诱因：安装器把主程序备份 `WeChat.x1a0he.original` 留在 bundle 内，会让签名封印失效、权限被反复作废 —— 见上文「踩坑 4」；先按那里把备份移出并重签，再 reset TCC。
 
 ### 怎么确认防撤回真的生效了（不想麻烦别人撤回消息）
 
 1. 字节补丁类方案先验字节：`python3 scripts/check_patch.py <CFBundleVersion>`，两处都 `✅ 补丁在`
 2. 再验功能，最省事的是**双开自测**：小号发一条消息给主号 → 小号撤回 → 看主号窗口里那条是否还在（还在 = 生效）
 3. 「字节在」不等于「功能生效」—— 别只看安装脚本打印的成功提示
+
+### 插件装不上 / 提示版本不支持
+
+插件按微信 **build 号**匹配（不是版本号）。先查 `CFBundleVersion`，再去插件 README 的支持表里搜 —— 搜不到就用表里对应版本的官方 DMG 升级/降级微信，或改用 naizhao fork 的字节补丁方案（见上文）。
 
 ### 微信更新后插件失效
 
@@ -508,7 +545,7 @@ sudo xattr -d com.apple.quarantine /path/to/file
 ### 是否支持 App Store 版微信？
 
 - **WeChatTweak-macOS**：理论上支持，但 App Store 版的沙盒限制可能更严格
-- **X1a0HeWeChatPlugin**：官方说明支持官网版和 App Store 版
+- **X1a0HeWeChatPlugin**：❌ 不支持 App Store / MAS 版（官方 README 明示），只能用官网 DMG 版
 - **建议**：优先使用官网下载的微信（非 App Store 版），兼容性更好
 
 ### 卸载插件

@@ -1,6 +1,7 @@
 ---
 name: 360-cleaner
 description: 扫描系统上所有360旗下的软件，让用户手动选择要卸载/清理的软件，支持预设方案
+version: 1.0.0
 triggers:
   - 清理360
   - 卸载360

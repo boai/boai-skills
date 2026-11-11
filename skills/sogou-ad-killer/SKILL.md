@@ -1,6 +1,7 @@
 ---
 name: sogou-ad-killer
 description: 扫描系统上所有搜狗旗下软件，让用户手动选择要关闭哪些软件的广告，支持一键全禁搜狗输入法
+version: 1.0.0
 triggers:
   - 搜狗广告
   - 关闭搜狗广告

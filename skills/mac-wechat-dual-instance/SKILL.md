@@ -1,6 +1,7 @@
 ---
 name: mac-wechat-dual-instance
 description: 在 macOS 上同时运行多个微信实例（双开/多开），支持微信 4.x（Electron 架构），Apple Silicon 和 Intel 均可使用
+version: 1.0.0
 triggers:
   - 微信双开
   - 微信多开
